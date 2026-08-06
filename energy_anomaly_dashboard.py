@@ -174,74 +174,86 @@ def tool_fetch_readings(readings, anomaly):
         "output_summary": f"{len(window)} window readings, {len(lookback)} lookback readings",
     }
 
-def tool_compute_baseline(fetched, anomaly):
-    """Tool 2 — rolling median at matching hour/day-of-week and ±5°F temp band."""
-    lookback = fetched["lookback"].copy()
-    t, temp = anomaly.detected_at, anomaly.temp_f_at_detection
+# A comparison set this small gives a standard deviation that is mostly sampling
+# noise; twelve is the point where it stops swinging on one reading.
+MIN_COMPARISON_SAMPLES = 12
+# No meter is quieter than this, so a suspiciously tight sample cannot drive the
+# z-score to infinity by putting a near-zero number under the line.
+NOISE_FLOOR_FRACTION = 0.03
+NOISE_FLOOR_KWH = 0.75
 
-    if lookback.empty:
-        std = max(anomaly.baseline_kwh * 0.12, 1.0)
+
+def tool_compute_baseline(fetched, anomaly):
+    """Tool 2 — expected consumption and its spread, from one comparison set.
+
+    Mean and standard deviation must describe the *same* readings. Taking the
+    mean from one source and the spread from another leaves the z-score measuring
+    the gap between two reference points as much as the size of the spike.
+    """
+    lookback = fetched["lookback"]
+    t, temp = anomaly.detected_at, anomaly.temp_f_at_detection
+    fallback_mean = float(anomaly.baseline_kwh)
+
+    def result(mean, std, n, weather, basis):
+        # Floor the spread at plausible meter noise before it reaches the divisor.
+        std = max(float(std), mean * NOISE_FLOOR_FRACTION, NOISE_FLOOR_KWH)
         return {
-            "baseline_mean": anomaly.baseline_kwh,
+            "baseline_mean": float(mean),
             "baseline_std": std,
-            "weather_adjusted": False,
-            "n_samples": 0,
-            "basis": "no history",
-            "input_summary": "no lookback readings available",
-            "output_summary": f"fallback baseline={anomaly.baseline_kwh:.1f}, std={std:.1f}",
+            "weather_adjusted": weather,
+            "n_samples": int(n),
+            "basis": basis,
+            "input_summary": f"{len(lookback)} lookback readings · matched on {basis}",
+            "output_summary": (
+                f"mean={mean:.1f}, std={std:.1f}, weather_adjusted={weather}, n={n}"
+            ),
         }
 
-    lookback["hour"] = lookback.recorded_at.dt.hour
-    lookback["dow"] = lookback.recorded_at.dt.dayofweek
+    if len(lookback) < MIN_COMPARISON_SAMPLES:
+        return result(fallback_mean, fallback_mean * 0.12, len(lookback), False,
+                      "insufficient history")
 
-    same_slot = lookback[(lookback.hour == t.hour) & (lookback.dow == t.dayofweek)]
-    same_hour = lookback[lookback.hour == t.hour]
+    hist = lookback.assign(
+        hour=lookback.recorded_at.dt.hour,
+        weekend=lookback.recorded_at.dt.dayofweek >= 5,
+    )
+    same_slot = hist[(hist.hour == t.hour) & (hist.weekend == (t.dayofweek >= 5))]
+    pool, weather, basis = same_slot, True, f"hour={t.hour}, {'weekend' if t.dayofweek >= 5 else 'weekday'}"
+    if len(pool) < MIN_COMPARISON_SAMPLES:
+        pool, weather, basis = hist[hist.hour == t.hour], True, f"hour={t.hour}"
+    if len(pool) < MIN_COMPARISON_SAMPLES:
+        pool, weather, basis = hist, False, "all lookback readings"
+    if len(pool) < MIN_COMPARISON_SAMPLES:
+        return result(fallback_mean, fallback_mean * 0.12, len(pool), False,
+                      "insufficient history")
 
-    # Progressive fallback: the tightest match with enough samples wins. A 30-day
-    # feed rarely has 5 readings at the same hour AND weekday AND temperature, so
-    # widening to same-hour keeps the std grounded in real variance instead of a
-    # synthetic percentage of the mean.
-    ladder = [
-        (same_slot[same_slot.temp_f.between(temp - 5, temp + 5)], True,
-         f"hour={t.hour}, dow={t.dayofweek}, temp={temp:.0f}°F ±5°F"),
-        (same_hour[same_hour.temp_f.between(temp - 5, temp + 5)], True,
-         f"hour={t.hour}, temp={temp:.0f}°F ±5°F"),
-        (same_slot, False, f"hour={t.hour}, dow={t.dayofweek}"),
-        (same_hour, False, f"hour={t.hour}"),
-        (lookback, False, "all 28d readings"),
-    ]
+    # Condition on temperature by taking the nearest readings rather than a fixed
+    # band. A ±5°F band is empty whenever the weather has moved, and falling back
+    # to "any temperature" quietly compares a hot afternoon against a cold one.
+    if weather and pd.notna(temp):
+        nearest = (pool.temp_f - temp).abs().nsmallest(
+            max(MIN_COMPARISON_SAMPLES, len(pool) // 3)
+        ).index
+        pool = pool.loc[nearest]
+        basis += f", nearest {len(pool)} by temp to {temp:.0f}°F"
 
-    std, n, weather_adjusted, basis = None, 0, False, "fallback"
-    for sample, is_weather, desc in ladder:
-        if len(sample) < 5:
-            continue
-        s = sample.kwh.std()
-        if pd.isna(s) or s <= 0:
-            continue
-        std, n, weather_adjusted, basis = float(s), len(sample), is_weather, desc
-        break
-
-    if std is None:
-        std = max(anomaly.baseline_kwh * 0.12, 1.0)
-        basis = "synthetic (insufficient history)"
-
-    return {
-        "baseline_mean": anomaly.baseline_kwh,
-        "baseline_std": std,
-        "weather_adjusted": weather_adjusted,
-        "n_samples": n,
-        "basis": basis,
-        "input_summary": f"28d lookback · matched on {basis}",
-        "output_summary": (
-            f"mean={anomaly.baseline_kwh:.1f}, std={std:.1f}, "
-            f"weather_adjusted={weather_adjusted}, n={n}"
-        ),
-    }
+    std = pool.kwh.std()
+    if pd.isna(std) or std <= 0:
+        return result(fallback_mean, fallback_mean * 0.12, len(pool), False,
+                      "no variance in comparison set")
+    return result(pool.kwh.median(), std, len(pool), weather, basis)
 
 
 def tool_run_significance_test(baseline, anomaly):
-    """Tool 3 — z-score of the spike delta against the weather-adjusted baseline."""
-    z = anomaly.spike_kwh / baseline["baseline_std"]
+    """Tool 3 — how far the observed peak sits from what this meter normally does.
+
+    Both terms come from Tool 2's comparison set. The previous version divided a
+    delta measured against the workbook's stored baseline by a spread measured
+    over a different sample, so the two disagreed by however far apart those
+    references were.
+    """
+    observed = float(anomaly.baseline_kwh) + float(anomaly.spike_kwh)
+    z = (observed - baseline["baseline_mean"]) / baseline["baseline_std"]
     p = _two_tailed_p(z)
     percentile = (1 - p / 2) * 100
     verdict = "significant" if z >= 2.0 else "not_significant"

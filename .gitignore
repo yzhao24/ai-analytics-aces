@@ -18,3 +18,12 @@ env/
 
 # Local exports
 anomaly_log.csv
+
+# Credentials — never commit. Auth comes from `ant auth login` (OAuth profile in
+# ~/.config/anthropic/) or an exported ANTHROPIC_API_KEY, never from a file here.
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+.anthropic/

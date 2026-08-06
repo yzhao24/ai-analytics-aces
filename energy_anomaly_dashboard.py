@@ -9,6 +9,7 @@ Trends / Settings) and the 4-tool agent orchestrator described in wireframe_v2.m
 reading all data from dummy_data_set1.xlsx per data_schema_v2.md.
 """
 
+import json
 import math
 from pathlib import Path
 
@@ -17,6 +18,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 DATA_FILE = Path(__file__).parent / "dummy_data_set1.xlsx"
+LLM_FILE = Path(__file__).parent / "classifications_llm.json"
 
 BG = "#0F1B2D"
 SURFACE = "#1A2B3C"
@@ -61,7 +63,46 @@ def load_data():
         for col in cols:
             d[table][col] = pd.to_datetime(d[table][col], errors="coerce")
 
+    d["classifications"] = overlay_llm_classifications(d)
     return d
+
+
+def overlay_llm_classifications(d):
+    """Fold in `classifications_llm.json` if the classifier has been run.
+
+    Written by classifier.py rather than back into the workbook, which is binary
+    and unmergeable. An LLM row replaces the workbook row for the same anomaly, so
+    a full run scores the classifier end to end instead of a mix of pre-written
+    labels and fresh ones.
+    """
+    existing = d["classifications"]
+    if not LLM_FILE.exists():
+        return existing
+
+    reg = d["classification_registry"].set_index("classification_id")
+    rows = []
+    for anomaly_id, r in json.loads(LLM_FILE.read_text()).items():
+        type_id = r["classification_type_id"]
+        rows.append(
+            {
+                "classification_id": f"LLM-{anomaly_id}",
+                "anomaly_id": anomaly_id,
+                # Trust the registry's own top-level class over the model's,
+                # so the subtype and the class can never disagree downstream.
+                "top_level_class": reg.loc[type_id].top_level_class
+                if type_id in reg.index
+                else r["top_level_class"],
+                "classification_type_id": type_id,
+                "confidence_score": r["confidence_score"],
+                "explanation_text": r["explanation_text"],
+                "created_at": pd.NaT,
+                "review_recommended": r["confidence_score"] < 0.75,
+                "weather_adjusted": True,
+            }
+        )
+    llm = pd.DataFrame(rows)
+    kept = existing[~existing.anomaly_id.isin(llm.anomaly_id)]
+    return pd.concat([kept, llm], ignore_index=True)
 
 
 # ── Agent tools (Section 10 of the wireframe) ─────────────────────────────────

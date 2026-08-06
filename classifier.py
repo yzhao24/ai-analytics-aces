@@ -96,6 +96,21 @@ SCHEMA = {
 }
 
 
+def org_hint():
+    """Which account the SDK resolved, for error messages. Never prints a secret."""
+    import subprocess
+
+    try:
+        out = subprocess.run(["ant", "auth", "status"], capture_output=True,
+                             text=True, timeout=10).stdout
+        for line in out.splitlines():
+            if "Logged in to" in line:
+                return line.strip()
+    except Exception:
+        pass
+    return "unknown (ANTHROPIC_API_KEY, or `ant auth status` for details)"
+
+
 def load_inputs():
     xl = pd.ExcelFile(DATA_FILE)
     sheets = {n: xl.parse(n) for n in xl.sheet_names if n != FORBIDDEN_SHEET}
@@ -211,6 +226,17 @@ def classify_all(only_missing=False):
             )
         except anthropic.AuthenticationError:
             sys.exit(NO_CREDS)
+        except anthropic.BadRequestError as e:
+            # Credentials can be perfectly valid on an org with no credits, and
+            # the models endpoint answers fine, so this only surfaces here.
+            if "credit balance" in str(e).lower():
+                sys.exit(
+                    "\nThe account is authenticated but has no API credits.\n"
+                    "  Add credits at https://console.anthropic.com -> Plans & Billing,\n"
+                    "  or re-run `ant auth login` and pick an organisation that has them.\n"
+                    f"  Currently signed in to: {org_hint()}"
+                )
+            raise
 
         if resp.stop_reason == "refusal":
             print(" refused, skipped")

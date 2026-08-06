@@ -261,8 +261,18 @@ def tool_run_significance_test(baseline, anomaly):
     temp = anomaly.temp_f_at_detection
     if not baseline["weather_adjusted"]:
         weather_context = (
-            f"No temperature match in the 28-day lookback at {temp:.0f}°F — "
-            "baseline falls back to hour/day-of-week only."
+            f"No temperature match in the lookback at {temp:.0f}°F — "
+            "baseline falls back to hour and weekend class only."
+        )
+    elif verdict == "not_significant":
+        # The alarm fired against a baseline that ignores temperature; once the
+        # comparison is drawn from hours at a similar temperature the excursion
+        # disappears. Saying weather does not explain it here would contradict
+        # the z-score printed directly above.
+        weather_context = (
+            f"At {temp:.0f}°F this sits within normal consumption for comparable "
+            "hours — the alert came from a baseline that does not account for "
+            "temperature, and weather explains the difference."
         )
     elif temp >= 90:
         weather_context = (
@@ -993,7 +1003,8 @@ def render_classification_panel(anomaly_id):
             width="stretch",
         )
     else:
-        st.caption("No comparable events found within ±0.5 z-score on this system.")
+        st.caption(f"No earlier spike on this system falls within "
+                   f"{COMPARABLE_Z_TOLERANCE:.0%} of this z-score.")
 
     # ── Zoomed spike chart
     section("Spike Chart · ±2hr window")
@@ -1399,8 +1410,8 @@ def render_history():
 
     # ── Success criteria — scored on the held-out set, so this ignores the
     # facility filter: the bar is defined over all 15 cases, not a subset.
-    section("Success Criteria · 15-case held-out test set")
     s = score_test_set()
+    section(f"Success Criteria · {s['n_cases']}-case held-out test set (core stratum)")
 
     p1, p2, p3 = st.columns([1, 1, 2])
     with p1:

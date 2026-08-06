@@ -207,10 +207,21 @@ def tool_run_significance_test(baseline, anomaly):
 def tool_fetch_comparable_events(data, anomaly, z_score, z_by_anomaly):
     """Tool 4 — past spikes on the same system within ±0.5 z of this one."""
     reg = data["classification_registry"].set_index("classification_id")
+    ano = data["anomalies"].set_index("anomaly_id")
     matches = []
 
     for other_id, other_z in z_by_anomaly.items():
         if other_id == anomaly.anomaly_id or abs(other_z - z_score) > 0.5:
+            continue
+
+        # "Comparable past events on the same system" per the wireframe: both
+        # halves matter. Without the system filter the panel cites a refrigeration
+        # fault as precedent for an HVAC spike; without the time filter it cites
+        # anomalies that had not happened yet when this one was detected.
+        other_row = ano.loc[other_id]
+        if other_row.system_id != anomaly.system_id:
+            continue
+        if other_row.detected_at >= anomaly.detected_at:
             continue
 
         cls_rows = data["classifications"][
@@ -231,10 +242,9 @@ def tool_fetch_comparable_events(data, anomaly, z_score, z_by_anomaly):
             label = r.subtype_label if pd.notna(r.subtype_label) else label
             cost = float(r.typical_cost_usd)
 
-        other = data["anomalies"][data["anomalies"].anomaly_id == other_id].iloc[0]
         matches.append(
             {
-                "Date": other.detected_at.strftime("%Y-%m-%d"),
+                "Date": other_row.detected_at.strftime("%Y-%m-%d"),
                 "Classification": label,
                 "Resolution": resolution,
                 "Cost": f"${cost:,.0f}",
@@ -250,6 +260,34 @@ def tool_fetch_comparable_events(data, anomaly, z_score, z_by_anomaly):
 
 
 DECISION_RANK = {"dismiss": 0, "monitor": 1, "dispatch": 2}
+
+
+def decide(data, z_score, classification):
+    """The agent's decision rule, shared by the panel and the batch scorer.
+
+    Two gates: a statistical one on the z-score and confidence, then a semantic
+    cap at whatever the matched classification itself warrants.
+    """
+    if z_score < 2.0:
+        return "dismiss"
+
+    confidence = (
+        float(classification.confidence_score) if classification is not None else None
+    )
+    decision = (
+        "dispatch"
+        if z_score >= 3.0 and confidence is not None and confidence >= 0.75
+        else "monitor"
+    )
+
+    if classification is not None:
+        reg = data["classification_registry"]
+        match = reg[reg.classification_id == classification.classification_type_id]
+        if not match.empty:
+            ceiling = match.iloc[0].recommended_action
+            if DECISION_RANK[ceiling] < DECISION_RANK[decision]:
+                decision = ceiling
+    return decision
 
 
 def run_agent(data, anomaly, classification, z_by_anomaly):
@@ -278,22 +316,7 @@ def run_agent(data, anomaly, classification, z_by_anomaly):
         )
         trace.append(("fetch_comparable_events", comp))
         comparables = comp["matches"]
-
-        if sig["z_score"] >= 3.0 and confidence is not None and confidence >= 0.75:
-            decision = "dispatch"
-        else:
-            decision = "monitor"
-
-        # The statistical gate says how *confident* we are, not what kind of event
-        # this is. A significant operational variation is still not a dispatch, so
-        # cap the decision at whatever the classification itself warrants.
-        if classification is not None:
-            reg = data["classification_registry"]
-            match = reg[reg.classification_id == classification.classification_type_id]
-            if not match.empty:
-                ceiling = match.iloc[0].recommended_action
-                if DECISION_RANK[ceiling] < DECISION_RANK[decision]:
-                    decision = ceiling
+        decision = decide(data, sig["z_score"], classification)
 
     return {
         "decision": decision,
@@ -410,6 +433,104 @@ def compute_z_scores():
         baseline = tool_compute_baseline(fetched, anomaly)
         out[anomaly.anomaly_id] = anomaly.spike_kwh / baseline["baseline_std"]
     return out
+
+
+@st.cache_data
+def score_test_set():
+    """Precision/recall on the equipment-fault class against `test_set_15_cases`.
+
+    This is the spec's primary success bar. Abstentions — anomalies the classifier
+    never labelled — count as false negatives: from the manager's seat an
+    unanswered spike and a wrongly-answered one are the same missed fault.
+    """
+    data = load_data()
+    truth = data["test_set_15_cases"][
+        ["anomaly_id", "true_top_level_class", "true_subtype_label"]
+    ]
+    pred = data["classifications"][["anomaly_id", "top_level_class", "confidence_score"]]
+    scored = truth.merge(pred, on="anomaly_id", how="left")
+    scored["predicted"] = scored.top_level_class.fillna("(abstained)")
+
+    is_fault = scored.true_top_level_class == "equipment_fault"
+    said_fault = scored.predicted == "equipment_fault"
+    tp, fp, fn = int((said_fault & is_fault).sum()), int((said_fault & ~is_fault).sum()), int((~said_fault & is_fault).sum())
+
+    return {
+        "table": scored,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "precision": tp / (tp + fp) if tp + fp else float("nan"),
+        "recall": tp / (tp + fn) if tp + fn else float("nan"),
+        "n_cases": len(scored),
+        "n_faults": int(is_fault.sum()),
+    }
+
+
+# Cost parameters from the team spec: ~$300 per technician dispatch, $2,000-$8,000
+# in excess consumption per undetected equipment fault. The conservative end of the
+# miss range is used so the comparison cannot be accused of flattering the tool.
+DISPATCH_COST_USD = 300.0
+MISSED_FAULT_COST_USD = 2000.0
+
+
+@st.cache_data
+def score_decision_value():
+    """Expected cost of the agent's recommendations vs. two fixed policies.
+
+    Classification accuracy says whether the labels are right; it does not say
+    whether following the tool beats ignoring it. This scores all three policies
+    on the same 15 cases so the comparison is decidable.
+    """
+    data = load_data()
+    z_by_anomaly = compute_z_scores()
+    truth = data["test_set_15_cases"].set_index("anomaly_id").true_top_level_class
+
+    rows = []
+    for anomaly in data["anomalies"].itertuples():
+        cls_rows = data["classifications"][
+            data["classifications"].anomaly_id == anomaly.anomaly_id
+        ]
+        decision = decide(
+            data,
+            z_by_anomaly[anomaly.anomaly_id],
+            cls_rows.iloc[0] if not cls_rows.empty else None,
+        )
+        rows.append(
+            {
+                "anomaly_id": anomaly.anomaly_id,
+                "decision": decision,
+                "is_fault": truth.get(anomaly.anomaly_id) == "equipment_fault",
+            }
+        )
+    df = pd.DataFrame(rows)
+    n, n_faults = len(df), int(df.is_fault.sum())
+
+    def cost(dispatched):
+        """Dispatch spend plus exposure from faults nobody was sent to look at."""
+        missed = int((df.is_fault & ~dispatched).sum())
+        return {
+            "dispatches": int(dispatched.sum()),
+            "caught": int((df.is_fault & dispatched).sum()),
+            "missed": missed,
+            "cost": dispatched.sum() * DISPATCH_COST_USD + missed * MISSED_FAULT_COST_USD,
+        }
+
+    policies = {
+        "Follow the tool": cost(df.decision == "dispatch"),
+        "Dispatch on every spike": cost(pd.Series(True, index=df.index)),
+        "Dispatch on none": cost(pd.Series(False, index=df.index)),
+    }
+    tool_cost = policies["Follow the tool"]["cost"]
+    return {
+        "policies": policies,
+        "n": n,
+        "n_faults": n_faults,
+        "mix": df.decision.value_counts().to_dict(),
+        "tool_wins": all(
+            tool_cost < v["cost"] for k, v in policies.items() if k != "Follow the tool"
+        ),
+    }
 
 
 def filter_facility(df, facility_id):
@@ -928,7 +1049,12 @@ def render_dashboard():
         ano_all[["anomaly_id", "facility_id"]], on="anomaly_id", how="left"
     )
     acts = filter_facility(acts, facility)
-    n_confirmed = int((acts.action_taken == "accepted").sum())
+    # "This month" per the schema — anchored to the newest action in the dataset
+    # rather than today's date, so the demo reads the same whenever it is run.
+    month_start = acts.acted_at.max().normalize().replace(day=1) if not acts.empty else None
+    n_confirmed = int(
+        ((acts.action_taken == "accepted") & (acts.acted_at >= month_start)).sum()
+    ) if month_start is not None else 0
 
     reg = data["classification_registry"].set_index("classification_id")
     exposure = 0.0
@@ -953,7 +1079,9 @@ def render_dashboard():
             kpi("Avg Classification Time", f"{avg_class_min:.1f}", color, unit="min",
                 sub=f"{len(classified)} classified events")
     with c3:
-        kpi("Faults Confirmed", n_confirmed, BLUE, sub="Accepted AI classifications")
+        kpi("Faults Confirmed This Month", n_confirmed, BLUE,
+            sub=f"Accepted since {month_start:%b 1}" if month_start is not None
+                else "No actions recorded")
     with c4:
         color = RED if exposure > 5000 else AMBER if exposure >= 1000 else GREEN
         kpi("Est. Cost Exposure", f"${exposure:,.0f}", color, sub="From open anomalies")
@@ -1142,6 +1270,75 @@ def render_history():
     with m4:
         kpi("Acted w/o Engineer", "—" if pd.isna(no_engineer) else f"{no_engineer:.0f}",
             TEAL, unit="%", sub="Theory C measurement")
+
+    # ── Success criteria — scored on the held-out set, so this ignores the
+    # facility filter: the bar is defined over all 15 cases, not a subset.
+    section("Success Criteria · 15-case held-out test set")
+    s = score_test_set()
+
+    p1, p2, p3 = st.columns([1, 1, 2])
+    with p1:
+        ok = s["precision"] >= 0.75
+        kpi("Precision · Equipment Fault", f"{s['precision']:.0%}", GREEN if ok else RED,
+            sub=f"Bar ≥75% · {'PASS' if ok else 'FAIL'} · {s['tp']} TP / {s['fp']} FP")
+    with p2:
+        ok = s["recall"] >= 0.70
+        kpi("Recall · Equipment Fault", f"{s['recall']:.0%}", GREEN if ok else RED,
+            sub=f"Bar ≥70% · {'PASS' if ok else 'FAIL'} · {s['fn']} missed of {s['n_faults']}")
+    with p3:
+        misses = s["table"][
+            (s["table"].true_top_level_class == "equipment_fault")
+            & (s["table"].predicted != "equipment_fault")
+        ]
+        if misses.empty:
+            st.caption("No equipment faults missed on the held-out set.")
+        else:
+            st.markdown(
+                f'<div class="muted">Missed equipment faults — each one costs recall '
+                f"{1 / s['n_faults']:.1%}:</div>",
+                unsafe_allow_html=True,
+            )
+            st.dataframe(
+                misses[["anomaly_id", "true_subtype_label", "predicted"]].rename(
+                    columns={"anomaly_id": "Anomaly", "true_subtype_label": "Actual fault",
+                             "predicted": "Classifier said"}
+                ),
+                hide_index=True, width="stretch",
+            )
+
+    # ── Decision value — does following the tool beat ignoring it?
+    section("Decision Value · cost of following the tool vs. fixed policies")
+    dv = score_decision_value()
+    cost_rows = pd.DataFrame(
+        [
+            {
+                "Policy": name,
+                "Sent": v["dispatches"],
+                "Caught": f"{v['caught']}/{dv['n_faults']}",
+                "Missed": v["missed"],
+                "Expected cost": f"${v['cost']:,.0f}",
+            }
+            for name, v in dv["policies"].items()
+        ]
+    )
+    st.dataframe(cost_rows, hide_index=True, width="stretch")
+
+    verdict_color = GREEN if dv["tool_wins"] else RED
+    verdict = ("Following the tool is cheaper than both fixed policies."
+               if dv["tool_wins"] else
+               "Following the tool is NOT cheaper than dispatching on every spike — "
+               "on this dataset the classifier's recommendations destroy value.")
+    st.markdown(
+        f'<div class="card" style="border-left:4px solid {verdict_color}">'
+        f'<div class="badge" style="background:{verdict_color};color:#fff">'
+        f'{"PASS" if dv["tool_wins"] else "FAIL"}</div>'
+        f'<span class="muted" style="margin-left:9px">{verdict}</span>'
+        f'<div class="muted" style="margin-top:7px">Priced at '
+        f"${DISPATCH_COST_USD:,.0f} per dispatch and ${MISSED_FAULT_COST_USD:,.0f} "
+        f"per undetected fault — the conservative end of the spec's $2,000–$8,000 "
+        f"range. Missed faults are charged to whichever policy failed to dispatch.</div></div>",
+        unsafe_allow_html=True,
+    )
 
     head_l, head_r = st.columns([3, 1])
     with head_l:

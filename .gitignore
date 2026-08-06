@@ -27,3 +27,6 @@ anomaly_log.csv
 *.pem
 secrets.json
 .anthropic/
+
+# Generated artifacts — regenerate with the scripts, do not commit
+weather_cache.csv

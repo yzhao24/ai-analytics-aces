@@ -197,7 +197,8 @@ def clean_series(system, hours, temps, rng):
 # ── Detector ─────────────────────────────────────────────────────────────────
 
 
-def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5):
+def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5,
+                     weather_aware=True):
     """Rolling median at the same hour, weekday, and temperature band.
 
     Mirrors the schema's definition, with one deliberate change: the lookback is
@@ -234,13 +235,21 @@ def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5):
             out[i] = np.median(kwh[prior])
             continue
 
+        pool = np.flatnonzero(candidates)
+        if not weather_aware:
+            # The alarm a manager already receives is a plain threshold on a
+            # simple baseline; it has no idea what the weather is doing. Leaving
+            # temperature out here is what gives the agent something to correct
+            # for downstream — a hot-afternoon surge trips this and is then
+            # cleared once Tool 2 conditions on temperature.
+            out[i] = np.median(kwh[pool])
+            continue
         # Take the readings nearest in temperature rather than those inside a
         # fixed band. A fixed band is empty during seasonal transitions — on the
         # first warm day of spring nothing in the prior 90 days is within 5F —
         # and the match then silently drops temperature altogether, leaving a
         # winter baseline against a summer reading. Nearest-neighbour always
         # conditions on temperature as far as the history allows.
-        pool = np.flatnonzero(candidates)
         nearest = pool[np.argsort(np.abs(temps[pool] - temps[i]))[:neighbours]]
         out[i] = np.median(kwh[nearest])
     return out
@@ -293,6 +302,8 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
     for s in systems.itertuples():
         series[s.system_id] = clean_series(s, hours, wide[s.facility_id], rng)
 
+    thresholds = facilities.set_index("facility_id")
+
     # 2. plan injections
     by_class = registry.groupby("top_level_class").classification_id.apply(list).to_dict()
     plan = []
@@ -300,12 +311,23 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
     def pick_ct(pool):
         return str(rng.choice(pool))
 
-    # Core stratum mirrors the spec's class balance: 9 fault, 4 operational, 2 data.
-    core_ids = (
-        [pick_ct(by_class["equipment_fault"]) for _ in range(round(n_core * 0.60))]
-        + [pick_ct(by_class["operational_variation"]) for _ in range(round(n_core * 0.27))]
-        + [pick_ct(by_class["data_anomaly"]) for _ in range(n_core - round(n_core * 0.60) - round(n_core * 0.27))]
-    )
+    # Every classification the product can emit must appear at least once, or the
+    # test set silently fails to exercise it. Random draws missed CT-010, the
+    # weather-driven surge — the one case built to separate Theory A from
+    # Theory B — leaving the weather machinery untested.
+    n_fault = round(n_core * 0.60)
+    n_oper = round(n_core * 0.27)
+    quota = {"equipment_fault": n_fault, "operational_variation": n_oper,
+             "data_anomaly": n_core - n_fault - n_oper}
+    core_ids = []
+    for cls, want in quota.items():
+        pool = by_class[cls]
+        core_ids += pool[:want]                      # one of each, in order
+        core_ids += [pick_ct(pool) for _ in range(max(0, want - len(pool)))]
+    core_ids = core_ids[:n_core]
+    missing = [c for c in CATALOGUE if c not in core_ids]
+    if missing:
+        print(f"  note: {len(missing)} classification(s) not in core stratum: {missing}")
     for ct in core_ids:
         plan.append(("core", [ct]))
     for _ in range(n_co):
@@ -330,18 +352,36 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         host = hosts[rng.integers(len(hosts))]
         arr = series[host.system_id]
 
-        for _ in range(60):
+        # A weather-driven surge only exists when it is hot. Placing one on a mild
+        # hour produces no excursion at all, which is how CT-010 — the case that
+        # separates Theory A from Theory B — kept vanishing from the test set.
+        needs_heat = "CT-010" in ct_ids
+        temps_here = wide[host.facility_id]
+        hot = np.percentile(temps_here, 85)
+
+        for _ in range(200):
             at = usable[rng.integers(len(usable))]
             idx = hours.get_loc(at)
             span = max(CATALOGUE[c]["hours"] for c in ct_ids)
-            if not (taken[host.system_id] & set(range(idx - 6, idx + span + 6))):
-                break
+            if taken[host.system_id] & set(range(idx - 6, idx + span + 6)):
+                continue
+            if needs_heat and temps_here[idx] < hot:
+                continue
+            break
         else:
             continue
 
         level = float(np.median(arr[max(0, idx - 336):idx]))
         scale = {"core": (1.6, 3.4), "co_occurring": (1.5, 3.0), "sub_threshold": (0.42, 0.62)}[stratum]
         magnitude = level * float(rng.uniform(*scale))
+
+        # Several shapes apply only a fraction of the magnitude, so a spike sized
+        # off a low-consumption meter can land under the alert threshold and never
+        # be detected. Floor it so the case reaches the test set — except in the
+        # sub-threshold stratum, where being marginal is the whole point.
+        if stratum != "sub_threshold":
+            magnitude = max(magnitude, 3.0 * float(thresholds.loc[host.facility_id]
+                                                   .spike_kwh_threshold))
 
         span = 0
         for ct in ct_ids:
@@ -371,11 +411,10 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
 
     # 5. detect
     print("detecting spikes …")
-    thresholds = facilities.set_index("facility_id")
     detected = []
     for sid, g in readings.groupby("system_id", sort=False):
         g = g.sort_values("recorded_at").reset_index(drop=True)
-        g["baseline_kwh"] = rolling_baseline(g)
+        g["baseline_kwh"] = rolling_baseline(g, weather_aware=False)
         cfg = thresholds.loc[g.facility_id.iloc[0]]
         # Nothing is monitored until a full lookback of history exists — before
         # that the baseline is built from too few readings and flags ordinary

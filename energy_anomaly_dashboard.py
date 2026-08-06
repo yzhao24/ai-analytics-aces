@@ -289,14 +289,24 @@ def tool_run_significance_test(baseline, anomaly):
     }
 
 
+# Within this fraction of the current z-score counts as "comparable severity".
+COMPARABLE_Z_TOLERANCE = 0.25
+
+
 def tool_fetch_comparable_events(data, anomaly, z_score, z_by_anomaly):
     """Tool 4 — past spikes on the same system within ±0.5 z of this one."""
     reg = data["classification_registry"].set_index("classification_id")
     ano = data["anomalies"].set_index("anomaly_id")
     matches = []
 
+    # The wireframe's ±0.5 window assumed z values clustered around 2 to 4. Real
+    # ones span 10 to 84, so an absolute half-point window is about 1% of the
+    # range and matches nothing. A proportional window keeps the intent — spikes
+    # of comparable severity — at any scale.
+    tolerance = max(COMPARABLE_Z_TOLERANCE * abs(z_score), 0.5)
+
     for other_id, other_z in z_by_anomaly.items():
-        if other_id == anomaly.anomaly_id or abs(other_z - z_score) > 0.5:
+        if other_id == anomaly.anomaly_id or abs(other_z - z_score) > tolerance:
             continue
 
         # "Comparable past events on the same system" per the wireframe: both

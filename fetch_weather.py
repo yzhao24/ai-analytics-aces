@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 
-DATA_FILE = Path(__file__).parent / "dummy_data_set1.xlsx"
+DATA_FILE = Path(__file__).parent / "dummy_data_set2.xlsx"
 OUT_FILE = Path(__file__).parent / "weather_real.csv"
 ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
 

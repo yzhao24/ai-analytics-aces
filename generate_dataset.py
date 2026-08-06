@@ -5,7 +5,7 @@ The workbook shipped without the script that produced it, so the dataset could
 not be extended, re-driven from real weather, or given harder cases. This
 rebuilds it end to end and is the file to edit when the data needs to change.
 
-What it does differently from dummy_data_set1.xlsx:
+What it does differently from the original v1 workbook:
 
   * Consumption is driven by REAL hourly temperatures (Open-Meteo archive), not
     an invented temperature series. Weather adjustment is therefore testable
@@ -41,7 +41,7 @@ import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).parent
-SOURCE_WORKBOOK = HERE / "dummy_data_set1.xlsx"   # registries are copied from here
+SOURCE_WORKBOOK = HERE / "registries.xlsx"        # facilities, systems, classifications
 WEATHER_CACHE = HERE / "weather_cache.csv"
 
 # ── Load model ────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ Run with:  streamlit run energy_anomaly_dashboard.py
 
 Implements the 4-screen wireframe (Dashboard / Classification Panel / History &
 Trends / Settings) and the 4-tool agent orchestrator described in wireframe_v2.md,
-reading all data from dummy_data_set1.xlsx per data_schema_v2.md.
+reading all data from dummy_data_set2.xlsx per data_schema_v2.md.
 """
 
 import json
@@ -17,7 +17,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-DATA_FILE = Path(__file__).parent / "dummy_data_set1.xlsx"
+DATA_FILE = Path(__file__).parent / "dummy_data_set2.xlsx"
 LLM_FILE = Path(__file__).parent / "classifications_llm.json"
 
 BG = "#0F1B2D"
@@ -64,6 +64,30 @@ def load_data():
             d[table][col] = pd.to_datetime(d[table][col], errors="coerce")
 
     d["classifications"] = overlay_llm_classifications(d)
+
+    # An anomaly the classifier has answered is no longer unclassified. Without
+    # this the table shows a label next to a status of "unclassified", the donut
+    # counts the same spike twice, and every row renders as severity "—".
+    answered = set(d["classifications"].anomaly_id)
+    if answered:
+        ano = d["anomalies"]
+        newly = ano.anomaly_id.isin(answered) & (ano.status == "unclassified")
+        ano.loc[newly, "status"] = "classified"
+
+        # Time to classify is real wall-clock from the classifier run, not a
+        # figure carried in the workbook. Absent for runs made before the
+        # classifier started recording it, so the KPI stays blank rather than
+        # inventing a number.
+        latency = d["classifications"].set_index("anomaly_id").get("latency_seconds")
+        if latency is not None and latency.notna().any():
+            mins = ano.anomaly_id.map(latency).astype("float64") / 60.0
+            fill = newly & mins.notna()
+            ano["classification_minutes"] = ano.classification_minutes.astype("float64")
+            ano["classified_at"] = pd.to_datetime(ano.classified_at, errors="coerce")
+            ano.loc[fill, "classification_minutes"] = mins[fill]
+            ano.loc[fill, "classified_at"] = ano.detected_at[fill] + pd.to_timedelta(
+                mins[fill], unit="m"
+            )
     return d
 
 
@@ -98,6 +122,7 @@ def overlay_llm_classifications(d):
                 "created_at": pd.NaT,
                 "review_recommended": r["confidence_score"] < 0.75,
                 "weather_adjusted": True,
+                "latency_seconds": r.get("latency_seconds"),
             }
         )
     llm = pd.DataFrame(rows)
@@ -485,26 +510,36 @@ def score_test_set():
     unanswered spike and a wrongly-answered one are the same missed fault.
     """
     data = load_data()
-    truth = data["test_set_15_cases"][
-        ["anomaly_id", "true_top_level_class", "true_subtype_label"]
-    ]
+    cols = ["anomaly_id", "true_top_level_class", "true_subtype_label"]
+    truth = data["test_set_15_cases"]
+    if "stratum" in truth.columns:
+        cols.append("stratum")
+    truth = truth[cols]
     pred = data["classifications"][["anomaly_id", "top_level_class", "confidence_score"]]
     scored = truth.merge(pred, on="anomaly_id", how="left")
     scored["predicted"] = scored.top_level_class.fillna("(abstained)")
+    if "stratum" not in scored.columns:
+        scored["stratum"] = "core"
 
-    is_fault = scored.true_top_level_class == "equipment_fault"
-    said_fault = scored.predicted == "equipment_fault"
-    tp, fp, fn = int((said_fault & is_fault).sum()), int((said_fault & ~is_fault).sum()), int((~said_fault & is_fault).sum())
+    def counts(df):
+        is_fault = df.true_top_level_class == "equipment_fault"
+        said = df.predicted == "equipment_fault"
+        tp, fp, fn = int((said & is_fault).sum()), int((said & ~is_fault).sum()), int((~said & is_fault).sum())
+        return {
+            "tp": tp, "fp": fp, "fn": fn,
+            "precision": tp / (tp + fp) if tp + fp else float("nan"),
+            "recall": tp / (tp + fn) if tp + fn else float("nan"),
+            "n_cases": len(df), "n_faults": int(is_fault.sum()),
+        }
 
+    # The spec's bar is defined over the core stratum. Co-occurring and
+    # sub-threshold cases exist to probe where the scheme breaks, so folding
+    # them into the headline number would answer a different question.
+    core = scored[scored.stratum == "core"]
     return {
         "table": scored,
-        "tp": tp,
-        "fp": fp,
-        "fn": fn,
-        "precision": tp / (tp + fp) if tp + fp else float("nan"),
-        "recall": tp / (tp + fn) if tp + fn else float("nan"),
-        "n_cases": len(scored),
-        "n_faults": int(is_fault.sum()),
+        **counts(core),
+        "by_stratum": {s: counts(g) for s, g in scored.groupby("stratum")},
     }
 
 
@@ -1134,7 +1169,9 @@ def render_dashboard():
     left, right = st.columns([2, 1])
 
     with left:
-        section("Energy Timeline · 30-day consumption")
+        span_days = (data["energy_readings"].recorded_at.max()
+                     - data["energy_readings"].recorded_at.min()).days
+        section(f"Energy Timeline · {span_days}-day consumption")
         readings = filter_facility(data["energy_readings"], facility)
         # Hourly rather than daily: a one-hour spike barely moves a daily total, so
         # daily aggregation flattens every anomaly out of the line entirely.
@@ -1185,7 +1222,9 @@ def render_dashboard():
             .top_level_class.value_counts()
             .to_dict()
         )
-        n_unclassified = int((view.status == "unclassified").sum())
+        # Only spikes with no class at all — a classified spike is already
+        # represented by its own slice.
+        n_unclassified = int(view.top_level_class.isna().sum())
         if n_unclassified:
             counts["unclassified"] = n_unclassified
 

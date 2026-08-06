@@ -1,5 +1,7 @@
 """
-Reproduces every figure cited in the adversarial review, from dummy_data_set1.xlsx.
+Reproduces the review's figures. NOTE: the review was written against v1;
+this now reads v2, so the "review cites" markers no longer match. Kept for the
+method, not the numbers.
 
 Run with:  ./.venv/bin/python verify_review_numbers.py
 
@@ -15,7 +17,7 @@ MISS_COST_LOW = 2000.0       # spec: "$2,000-$8,000 in excess electricity cost"
 MISS_COST_HIGH = 8000.0
 COST_RATIO = 167.0           # spec: "ratio of miss cost to false-alarm cost is 167:1 to 800:1"
 
-xl = pd.ExcelFile("dummy_data_set1.xlsx")
+xl = pd.ExcelFile("dummy_data_set2.xlsx")
 readings = xl.parse("energy_readings")
 anomalies = xl.parse("anomalies")
 classifications = xl.parse("classifications")

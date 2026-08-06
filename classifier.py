@@ -22,12 +22,13 @@ Usage:
 
 import argparse
 import json
+import time
 import sys
 from pathlib import Path
 
 import pandas as pd
 
-DATA_FILE = Path(__file__).parent / "dummy_data_set1.xlsx"
+DATA_FILE = Path(__file__).parent / "dummy_data_set2.xlsx"
 OUT_FILE = Path(__file__).parent / "classifications_llm.json"
 
 MODEL = "claude-opus-5"
@@ -211,6 +212,7 @@ def classify_all(only_missing=False):
         system = sys_rows.iloc[0] if not sys_rows.empty else None
 
         print(f"  {anomaly.anomaly_id} …", end="", flush=True)
+        t0 = time.monotonic()
         try:
             resp = client.messages.create(
                 model=MODEL,
@@ -244,9 +246,12 @@ def classify_all(only_missing=False):
 
         text = next(b.text for b in resp.content if b.type == "text")
         out = json.loads(text)
+        # Wall-clock per spike is the spec's "classification within 5 minutes"
+        # criterion. It was unmeasurable while the labels were pre-written.
+        out["latency_seconds"] = round(time.monotonic() - t0, 2)
         results[anomaly.anomaly_id] = out
         print(f" {out['top_level_class']} / {out['classification_type_id']} "
-              f"({out['confidence_score']:.0%})")
+              f"({out['confidence_score']:.0%})  {out['latency_seconds']:.1f}s")
 
     OUT_FILE.write_text(json.dumps(results, indent=2))
     print(f"\nwrote {len(results)} classifications -> {OUT_FILE.name}")

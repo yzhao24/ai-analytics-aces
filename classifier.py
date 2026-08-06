@@ -60,11 +60,35 @@ maximum, or a near-zero reading followed by a compensating spike. Magnitude alon
 is the tell — a spike far larger than the plant can physically draw is a metering \
 artefact, not a bigger fault.
 
+Telling a one-hour equipment fault from a one-hour metering artefact is the \
+hardest call here, and shape alone will not do it. Ask whether the plant could \
+physically draw that much. A lighting circuit or a surge pulling two or three \
+times its normal load is electrically possible and is a fault. A meter reporting \
+five or ten times what the sub-system could ever draw, or dropping to near zero \
+and then repaying it in the next hour, is the instrument failing, not the plant. \
+Sustained draw across several hours is almost never a metering artefact.
+
 Set confidence_score to your genuine posterior, not a default. The cost of \
 missing a real equipment fault is far higher than the cost of an unnecessary \
 technician visit, so do not label something operational variation merely because \
 it is plausible — reserve that for cases where the operational explanation is \
 clearly better supported.
+
+Then say what to do about it. recommended_action must match the typical action \
+shown for the classification you picked, so the manager is never told to dispatch \
+on something the catalogue treats as routine.
+
+next_action is the instruction the manager acts on, and it must be specific to \
+this spike rather than generic advice. Follow the shape of the decision:
+- dispatch: name the trade to send and the first thing to look at.
+- monitor: name what would confirm the fault if it recurs — which hour, which \
+system, what magnitude — over the next 24 hours.
+- dismiss: name the known event or artefact this is, and say what if anything to \
+log so the same spike is not re-investigated next month.
+
+symptom_to_check is what the technician is told they are looking for, in the \
+words a refrigeration or HVAC engineer would use. Fill it only when dispatching; \
+leave it empty otherwise.
 
 explanation_text is read by a non-technical operations manager who must decide \
 whether to dispatch. State what the pattern shows and what it implies, in two or \
@@ -86,12 +110,28 @@ SCHEMA = {
             "description": "Posterior probability that this classification is correct, 0.0-1.0",
         },
         "explanation_text": {"type": "string"},
+        "recommended_action": {
+            "type": "string",
+            "enum": ["dispatch", "monitor", "dismiss"],
+            "description": "Must match the typical action for the chosen classification",
+        },
+        "next_action": {
+            "type": "string",
+            "description": "The specific instruction for the manager, one or two sentences",
+        },
+        "symptom_to_check": {
+            "type": "string",
+            "description": "For dispatch, the symptom to hand the technician. Empty otherwise.",
+        },
     },
     "required": [
         "top_level_class",
         "classification_type_id",
         "confidence_score",
         "explanation_text",
+        "recommended_action",
+        "next_action",
+        "symptom_to_check",
     ],
     "additionalProperties": False,
 }
@@ -250,7 +290,7 @@ def classify_all(only_missing=False):
         # criterion. It was unmeasurable while the labels were pre-written.
         out["latency_seconds"] = round(time.monotonic() - t0, 2)
         results[anomaly.anomaly_id] = out
-        print(f" {out['top_level_class']} / {out['classification_type_id']} "
+        print(f" {out['classification_type_id']} {out['recommended_action'].upper():8} "
               f"({out['confidence_score']:.0%})  {out['latency_seconds']:.1f}s")
 
     OUT_FILE.write_text(json.dumps(results, indent=2))

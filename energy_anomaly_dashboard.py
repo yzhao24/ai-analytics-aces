@@ -83,7 +83,11 @@ def load_data():
             mins = ano.anomaly_id.map(latency).astype("float64") / 60.0
             fill = newly & mins.notna()
             ano["classification_minutes"] = ano.classification_minutes.astype("float64")
-            ano["classified_at"] = pd.to_datetime(ano.classified_at, errors="coerce")
+            # Excel datetimes arrive at second resolution; the computed value is
+            # nanosecond, and pandas will not assign across the two.
+            ano["classified_at"] = pd.to_datetime(
+                ano.classified_at, errors="coerce"
+            ).astype("datetime64[ns]")
             ano.loc[fill, "classification_minutes"] = mins[fill]
             ano.loc[fill, "classified_at"] = ano.detected_at[fill] + pd.to_timedelta(
                 mins[fill], unit="m"
@@ -123,6 +127,9 @@ def overlay_llm_classifications(d):
                 "review_recommended": r["confidence_score"] < 0.75,
                 "weather_adjusted": True,
                 "latency_seconds": r.get("latency_seconds"),
+                "recommended_action": r.get("recommended_action"),
+                "next_action": r.get("next_action"),
+                "symptom_to_check": r.get("symptom_to_check"),
             }
         )
     llm = pd.DataFrame(rows)
@@ -886,13 +893,22 @@ def render_classification_panel(anomaly_id):
         if anomaly.baseline_kwh
         else float("nan")
     )
-    action_text = recommended_action_text(
+    # The classifier writes an instruction grounded in this spike — which trade to
+    # send, which hour to watch, which artefact to log. Prefer it over the
+    # template, which can only restate the decision in general terms.
+    model_action = (
+        classification.get("next_action") if classification is not None else None
+    )
+    action_text = model_action or recommended_action_text(
         decision,
         anomaly,
         system,
         row.subtype_label if pd.notna(row.subtype_label) else None,
         classification.top_level_class if classification is not None else None,
         significant,
+    )
+    symptom = (
+        classification.get("symptom_to_check") if classification is not None else None
     )
 
     pattern_html = ""
@@ -913,7 +929,15 @@ def render_classification_panel(anomaly_id):
         f"{pattern_html}"
         f'<div class="muted" style="margin-top:9px">{agent["weather_context"]}</div>'
         f'<div style="margin-top:11px;font-size:13px;font-weight:600;color:{dc}">'
-        f"▸ {action_text}</div></div>",
+        f"▸ {action_text}</div>"
+        + (
+            f'<div class="muted" style="margin-top:9px;padding-top:8px;'
+            f'border-top:1px dashed {BORDER}"><b>Symptom for the technician</b><br>'
+            f"{symptom}</div>"
+            if symptom
+            else ""
+        )
+        + "</div>",
         unsafe_allow_html=True,
     )
     st.caption(

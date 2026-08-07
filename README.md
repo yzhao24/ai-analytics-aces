@@ -169,6 +169,16 @@ Review**, is always available and records as `escalated`.
 Only 4 of the 14 types call for a technician, so "equipment fault" and "send someone" are
 not the same thing.
 
+**A fifth path, exception, is always available.** Three actions cannot cover every spike,
+and a manager forced to pick the closest wrong one leaves no trace that the taxonomy
+failed. The Classification Panel takes a free-text note — what should happen instead and
+why — records the anomaly as `exception`, and shows it in the log with a teal badge.
+
+Those notes are the most useful data the product collects about its own limits. A reason
+that keeps recurring is a candidate for a fifteenth classification type. Both operational
+misclassifications in the current test set would have been caught this way, months before
+anyone scored a rubric.
+
 ---
 
 ## How the agent works

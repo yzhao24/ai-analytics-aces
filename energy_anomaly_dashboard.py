@@ -755,6 +755,7 @@ z_by_anomaly = compute_z_scores()
 st.session_state.setdefault("screen", "Dashboard")
 st.session_state.setdefault("open_anomaly", None)
 st.session_state.setdefault("status_overrides", {})
+st.session_state.setdefault("manager_notes", {})
 st.session_state.setdefault("page", 0)
 
 ano_all = build_anomaly_view().copy()
@@ -1131,6 +1132,56 @@ def render_classification_panel(anomaly_id):
             build_anomaly_view.clear()
             st.rerun()
 
+    # ── Exception — always available
+    # Three actions cannot cover every spike, and a manager forced to pick the
+    # closest wrong one leaves no trace that the taxonomy failed. Recording the
+    # exception in the manager's own words keeps that signal instead of losing
+    # it, and the notes are the shortlist for what the catalogue is missing.
+    existing = st.session_state.manager_notes.get(anomaly_id)
+    if existing:
+        st.markdown(
+            f'<div class="card" style="border-left:4px solid {TEAL};margin-top:10px">'
+            f'<span class="badge" style="background:{TEAL};color:#062b27">EXCEPTION '
+            f"RECORDED</span>"
+            f'<div class="muted" style="margin-top:7px">{existing}</div></div>',
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("None of these fit — record an exception", expanded=bool(existing)):
+        st.markdown(
+            '<div class="muted">Use this when the spike is real but the three '
+            "actions do not describe what should happen, or when the "
+            "classification is wrong in a way none of the 14 types capture. "
+            "Your note is kept with the anomaly.</div>",
+            unsafe_allow_html=True,
+        )
+        note = st.text_area(
+            "What should happen instead, and why?",
+            value=existing or "",
+            key=f"exc_{anomaly_id}",
+            placeholder="e.g. Contractor was on site rewiring the north bay — "
+                        "no fault, but not a routine operational event either. "
+                        "Hold until the work order closes.",
+            height=90,
+        )
+        save, clear = st.columns([3, 1])
+        with save:
+            if st.button("Record exception", key="act_exc", width="stretch"):
+                if note.strip():
+                    st.session_state.manager_notes[anomaly_id] = note.strip()
+                    st.session_state.status_overrides[anomaly_id] = "exception"
+                    st.session_state.open_anomaly = None
+                    build_anomaly_view.clear()
+                    st.rerun()
+                else:
+                    st.warning("Add a note before recording — the note is the point.")
+        with clear:
+            if existing and st.button("Remove", key="act_exc_clear", width="stretch"):
+                st.session_state.manager_notes.pop(anomaly_id, None)
+                st.session_state.status_overrides.pop(anomaly_id, None)
+                build_anomaly_view.clear()
+                st.rerun()
+
     if agent["confidence"] is not None:
         st.markdown(
             f'<div class="muted" style="margin-top:8px">Classifier confidence</div>',
@@ -1144,7 +1195,8 @@ def render_classification_panel(anomaly_id):
 
 def anomaly_table(df, key_prefix, page_size=None, page=0):
     """Anomaly table per the schema's column mapping, with a per-row action button."""
-    order = {"unclassified": 0, "escalated": 1, "classified": 2, "dismissed": 3}
+    order = {"unclassified": 0, "exception": 1, "escalated": 2,
+             "classified": 3, "dismissed": 4}
     df = df.assign(_o=df.status.map(order).fillna(9)).sort_values(
         ["_o", "detected_at"], ascending=[True, False]
     )
@@ -1200,7 +1252,13 @@ def anomaly_table(df, key_prefix, page_size=None, page=0):
             f'<span style="color:{sev_color};font-weight:600;font-size:11px">'
             f"{r.severity if not is_open else '—'}</span>",
         )
-        cell(cols[6], f'<span style="font-size:11px">{r.status}</span>')
+        status_html = (
+            f'<span class="badge" style="background:{TEAL}22;color:{TEAL};'
+            f'border:1px solid {TEAL}">exception</span>'
+            if r.status == "exception"
+            else f'<span style="font-size:11px">{r.status}</span>'
+        )
+        cell(cols[6], status_html)
 
         with cols[7]:
             st.markdown('<div style="padding-top:3px">', unsafe_allow_html=True)

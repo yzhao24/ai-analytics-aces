@@ -211,15 +211,24 @@ One row per manager decision on a classification. Created when the manager click
 | `action_id` | PK | Unique action ID | `ACT-0441` |
 | `classification_id` | FK → classifications | Which classification was acted on | `CLS-0891` |
 | `anomaly_id` | FK → anomalies | Which anomaly (denormalized for speed) | `ANO-1042` |
-| `action_taken` | ENUM | `dispatched`, `monitoring`, `dismissed`, `escalated` — one verb per outcome, matching the agent's own vocabulary | `dispatched` |
+| `action_taken` | ENUM | `dispatched`, `monitoring`, `dismissed`, `escalated`, `exception` — one verb per outcome, matching the agent's own vocabulary | `dispatched` |
+| `exception_note` | TEXT | The manager's own words, required when `action_taken = 'exception'` and NULL otherwise | `"Contractor rewiring the north bay — hold until the work order closes"` |
 | `acted_at` | TIMESTAMP | When the manager clicked | `2026-08-03 14:31:00` |
 | `resolution_minutes` | FLOAT | `acted_at - anomaly.detected_at` in minutes | `9.0` |
 | `engineer_called` | BOOLEAN | Did the manager call an engineer anyway? (self-reported) | `false` |
 | `actual_top_level_class` | ENUM | Post-resolution confirmed top-level class: `equipment_fault`, `operational_variation`, `data_anomaly` (nullable, filled in after resolution) | `equipment_fault` |
 | `actual_classification_id` | FK → classification_registry | Post-resolution confirmed subtype (nullable) | `CT-001` |
 
+**On `exception`:** the three actions cannot cover every spike. A manager forced to
+pick the closest wrong one leaves no trace that the taxonomy failed, so `exception`
+records that the classification was understood and none of the three responses fitted.
+`exception_note` carries the reason in the manager's own words. These notes are the
+shortlist for what `classification_registry` is missing — a repeated exception is a
+candidate for a fifteenth classification type.
+
 **Feeds into:**
 - "Faults Confirmed This Month" KPI → `COUNT(*) WHERE action_taken = 'dispatched'`
+- Taxonomy review → `COUNT(*) WHERE action_taken = 'exception'` grouped by system type
 - "Avg Classification Time" KPI → also uses `resolution_minutes` for end-to-end view
 - History screen resolution metrics → `AVG(resolution_minutes)`, false positive % (where `actual_fault_type_id ≠ classifications.fault_type_id`)
 - Success criteria tracking → `engineer_called = false` rate measures Theory C

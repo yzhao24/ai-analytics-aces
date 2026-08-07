@@ -494,7 +494,9 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
                  resolution_minutes=round(float(rng.uniform(6, 40)), 1),
                  engineer_called=bool(rng.random() < 0.25),
                  actual_top_level_class=t.true_top_level_class,
-                 actual_classification_id=t.true_classification_id)
+                 actual_classification_id=t.true_classification_id,
+                 # Free text, populated only when action_taken is "exception".
+                 exception_note=None)
         )
     actions = pd.DataFrame(acts)
 

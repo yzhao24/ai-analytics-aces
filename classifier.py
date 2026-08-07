@@ -60,6 +60,17 @@ maximum, or a near-zero reading followed by a compensating spike. Magnitude alon
 is the tell — a spike far larger than the plant can physically draw is a metering \
 artefact, not a bigger fault.
 
+The co-movement block is the strongest evidence you have for separating a fault \
+from operational variation, because the two look identical on a single meter. A \
+piece of equipment fails by itself: its meter moves and its neighbours do not. \
+Business activity moves the whole site: throughput, an extended shift or a busy \
+day lift every sub-system that serves it at once. If the other sub-systems rose \
+alongside this one, prefer operational variation even when the shape looks like \
+a fault. If they are flat while this meter is far above normal, prefer a fault \
+even when the timing would fit a busy period. A metering artefact also affects \
+one meter alone, so co-movement separates fault from operations, not fault from \
+bad data — use magnitude for that.
+
 Telling a one-hour equipment fault from a one-hour metering artefact is the \
 hardest call here, and shape alone will not do it. Ask whether the plant could \
 physically draw that much. A lighting circuit or a surge pulling two or three \
@@ -194,6 +205,56 @@ def spike_profile(readings, anomaly):
     )
 
 
+def comovement_context(data, anomaly):
+    """What every other sub-system at this facility did in the same hour.
+
+    A fault lifts one meter; an operational event lifts the whole site. That
+    difference is the only thing in hourly kWh that separates the two, and
+    classifying each meter in isolation throws it away. Deviation is measured
+    against each meter's own median at the same hour on other days, so a
+    sub-system that is always busy at 2pm does not read as elevated.
+    """
+    readings = data["energy_readings"]
+    systems = data["system_registry"]
+    at = anomaly.detected_at
+
+    sibs = systems[systems.facility_id == anomaly.facility_id]
+    lines = []
+    for s in sibs.itertuples():
+        meter = readings[readings.system_id == s.system_id]
+        now = meter[meter.recorded_at == at].kwh
+        ref = meter[(meter.recorded_at.dt.hour == at.hour)
+                    & (meter.recorded_at != at)].kwh.median()
+        if now.empty or not ref:
+            continue
+        dev = float(now.iloc[0]) / float(ref) - 1
+        tag = "  <-- this spike" if s.system_id == anomaly.system_id else ""
+        lines.append((s.system_id, dev,
+                      f"  {s.system_name:22} {dev:+7.0%}{tag}"))
+
+    if len(lines) < 2:
+        return "  (no other metered sub-system at this facility)"
+
+    host = next((d for sid, d, _ in lines if sid == anomaly.system_id), 0.0)
+    others = [d for sid, d, _ in lines if sid != anomaly.system_id]
+    moved = sum(1 for d in others if d > 0.20)
+    biggest = max(others) if others else 0.0
+
+    # Site-wide activity lifts meters by comparable amounts. One meter far above
+    # its neighbours is a single asset, even if the neighbours also moved — that
+    # is two events on the same site, not one shared cause.
+    if moved and host <= 2.0 * biggest:
+        verdict = (f"{moved} of {len(others)} other sub-systems rose by a similar "
+                   "amount — consistent with site-wide activity")
+    elif moved:
+        verdict = (f"{moved} other sub-system(s) rose, but this meter moved far "
+                   "more than any of them")
+    else:
+        verdict = "the other sub-systems are flat — this meter alone moved"
+
+    return "\n".join(t for _, _, t in lines) + f"\n  -> {verdict}"
+
+
 def build_prompt(data, anomaly, system):
     sys_name = system.system_name if system is not None else "unknown sub-system"
     sys_type = system.system_type if system is not None else "unknown"
@@ -207,6 +268,9 @@ def build_prompt(data, anomaly, system):
   Peak            : {peak:.1f} kWh/hr  ({multiple:.1f}x baseline, +{anomaly.spike_kwh:.1f} above)
   Duration        : {int(anomaly.duration_minutes)} minutes
   Outdoor temp    : {anomaly.temp_f_at_detection:.1f}F
+
+CO-MOVEMENT AT THIS FACILITY, SAME HOUR
+{comovement_context(data, anomaly)}
 
 CONSUMPTION, 3 HOURS EITHER SIDE
 {spike_profile(data['energy_readings'], anomaly)}

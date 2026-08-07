@@ -31,3 +31,4 @@ secrets.json
 # Generated artifacts — regenerate with the scripts, do not commit
 weather_cache.csv
 sample_bad_export.csv
+usability_rater_*.csv

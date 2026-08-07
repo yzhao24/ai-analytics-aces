@@ -59,9 +59,10 @@ def add(layout=LY_BLANK):
 
 
 def drop_empty_placeholders(slide):
+    """Every slide's content is in explicit text boxes, so no placeholder is
+    load-bearing — including the layout's slide-number one, which we do not want."""
     for ph in list(slide.placeholders):
-        if ph.placeholder_format.idx != 2 and not ph.text_frame.text.strip():
-            ph._element.getparent().remove(ph._element)
+        ph._element.getparent().remove(ph._element)
 
 
 def tb(slide, x, y, w, h, parts, size=26, color=BLACK, bold=False, align=PP_ALIGN.LEFT,

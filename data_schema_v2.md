@@ -211,7 +211,7 @@ One row per manager decision on a classification. Created when the manager click
 | `action_id` | PK | Unique action ID | `ACT-0441` |
 | `classification_id` | FK → classifications | Which classification was acted on | `CLS-0891` |
 | `anomaly_id` | FK → anomalies | Which anomaly (denormalized for speed) | `ANO-1042` |
-| `action_taken` | ENUM | `accepted`, `dismissed`, `escalated` | `accepted` |
+| `action_taken` | ENUM | `dispatched`, `monitoring`, `dismissed`, `escalated` — one verb per outcome, matching the agent's own vocabulary | `dispatched` |
 | `acted_at` | TIMESTAMP | When the manager clicked | `2026-08-03 14:31:00` |
 | `resolution_minutes` | FLOAT | `acted_at - anomaly.detected_at` in minutes | `9.0` |
 | `engineer_called` | BOOLEAN | Did the manager call an engineer anyway? (self-reported) | `false` |
@@ -219,7 +219,7 @@ One row per manager decision on a classification. Created when the manager click
 | `actual_classification_id` | FK → classification_registry | Post-resolution confirmed subtype (nullable) | `CT-001` |
 
 **Feeds into:**
-- "Faults Confirmed This Month" KPI → `COUNT(*) WHERE action_taken = 'accepted'`
+- "Faults Confirmed This Month" KPI → `COUNT(*) WHERE action_taken = 'dispatched'`
 - "Avg Classification Time" KPI → also uses `resolution_minutes` for end-to-end view
 - History screen resolution metrics → `AVG(resolution_minutes)`, false positive % (where `actual_fault_type_id ≠ classifications.fault_type_id`)
 - Success criteria tracking → `engineer_called = false` rate measures Theory C
@@ -286,7 +286,7 @@ One row per tool call within an agent run. Powers the "See steps" expandable tra
 |---|---|---|
 | **Active Anomalies** | `COUNT(*) WHERE anomalies.status = 'unclassified'` | `anomalies` |
 | **Avg Classification Time** | `AVG(classification_minutes) WHERE classified_at IS NOT NULL`, rolling 30 days | `anomalies` |
-| **Faults Confirmed This Month** | `COUNT(*) WHERE action_taken = 'accepted' AND acted_at >= start_of_month` | `manager_actions` |
+| **Faults Confirmed This Month** | `COUNT(*) WHERE action_taken = 'dispatched' AND acted_at >= start_of_month` | `manager_actions` |
 | **Est. Cost Exposure** | `SUM(fault_type_registry.typical_cost_usd)` for all open `unclassified` anomalies, joined via most likely system type | `anomalies` + `system_registry` + `fault_type_registry` |
 | **Facilities Online** | `COUNT(*) WHERE facility_registry.is_online = true` | `facility_registry` |
 

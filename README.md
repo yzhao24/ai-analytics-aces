@@ -18,6 +18,9 @@ with the statistical evidence behind the call.
 | `generate_dataset.py` | Builds the dataset from scratch. Edit this when the data needs to change |
 | `fetch_weather.py` | Pulls real hourly temperatures from Open-Meteo |
 | `verify_review_numbers.py` | Reproduces the figures cited in the adversarial reviews |
+| `score_rubric.py` | Scores the Assignment 2 evaluation rubric from the classifier output |
+| `stability_test.py` | Repeat runs and bias breakdown |
+| `input_guard.py` | Sanity checks for incoming meter data |
 | `dummy_data_set2.xlsx` | The dataset the dashboard reads (9 sheets, 12 months) |
 | `registries.xlsx` | Facilities, sub-systems, and the 14 classification types |
 | `classifications_llm.json` | Classifier output. Overlaid on the workbook at load time |
@@ -122,7 +125,49 @@ resolution metrics, **Success Criteria** (precision and recall against ground tr
 **Decision Value** (the tool priced against two fixed policies), and the full log with
 CSV export.
 
-**Settings** — facility list plus threshold and confidence sliders.
+**Settings** — facility list, threshold and confidence sliders, and **Import Meter Data**:
+upload an hourly CSV export and it is checked against the existing database before you
+rely on it. See below.
+
+## Checking incoming data
+
+The product used to tell you when one *reading* was implausible and say nothing when an
+entire *feed* was wrong. A file in watts instead of kilowatts, a meter that stopped
+reporting, a sub-system code that does not exist — each renders a perfectly plausible
+dashboard while every classification behind it is meaningless.
+
+`input_guard.py` profiles the settled history and tests new data against it: unit scale,
+negative and non-numeric values, runs of zeros, readings far beyond anything recorded,
+duplicate timestamps, gaps in hourly coverage, unregistered sub-systems, unreadable or
+future timestamps, overlap with data already held, and temperatures that read as Celsius
+in a Fahrenheit column.
+
+Two entry points. On load the dashboard checks its own most recent 14 days against the
+preceding history and raises a modal if anything looks off. Settings takes a CSV and
+checks it the same way. **Findings are prompts to check, never rejections** — nothing is
+discarded and nothing is overwritten.
+
+To try it, build a broken export and upload it in Settings:
+
+```bash
+python3 -c "
+import pandas as pd
+r = pd.ExcelFile('dummy_data_set2.xlsx').parse('energy_readings').tail(300).copy()
+r['kwh'] *= 1000                      # watts, not kilowatts
+r.loc[r.index[:6], 'system_id'] = 'SYS-999'
+r.to_csv('sample_bad_export.csv', index=False)"
+```
+
+## The three actions
+
+Every recommendation is one of **dispatch**, **monitor**, or **dismiss**, and the same
+three verbs run through the whole system — the classifier's output schema, the standing
+action attached to each of the 14 classification types, the button in the Classification
+Panel, and what gets written to `manager_actions`. A fourth path, **Flag for Engineer
+Review**, is always available and records as `escalated`.
+
+Only 4 of the 14 types call for a technician, so "equipment fault" and "send someone" are
+not the same thing.
 
 ---
 

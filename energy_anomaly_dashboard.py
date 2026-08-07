@@ -1105,18 +1105,17 @@ def render_classification_panel(anomaly_id):
     # Per the wireframe the three action paths key off the top-level class; when the
     # spike is unclassified we fall back to the agent's statistical decision.
     top_class = classification.top_level_class if classification is not None else None
-    if top_class == "equipment_fault":
-        primary_label, new_status = "✓ Dispatch Technician", "classified"
-    elif top_class == "operational_variation":
-        primary_label, new_status = "✓ Log as Operational — Monitor 24hr", "classified"
-    elif top_class == "data_anomaly":
-        primary_label, new_status = "✓ Dismiss — Meter/Sensor Error", "dismissed"
-    else:
-        primary_label, new_status = {
-            "dispatch": ("✓ Dispatch Technician", "classified"),
-            "monitor": ("✓ Log as Operational — Monitor 24hr", "classified"),
-            "dismiss": ("✓ Dismiss — Meter/Sensor Error", "dismissed"),
-        }[decision]
+    # The button records which of the three actions was taken, not merely that
+    # the manager agreed. "accepted" could not distinguish a dispatch from a
+    # monitor, which is exactly the difference the resolution metrics need.
+    BY_ACTION = {
+        "dispatch": ("✓ Dispatch Technician", "classified", "dispatched"),
+        "monitor": ("✓ Log as Operational — Monitor 24hr", "classified", "monitoring"),
+        "dismiss": ("✓ Dismiss — Meter/Sensor Error", "dismissed", "dismissed"),
+    }
+    by_class = {"equipment_fault": "dispatch", "operational_variation": "monitor",
+                "data_anomaly": "dismiss"}
+    primary_label, new_status, taken = BY_ACTION[by_class.get(top_class, decision)]
 
     left, right = st.columns(2)
     with left:
@@ -1243,7 +1242,7 @@ def render_dashboard():
     # rather than today's date, so the demo reads the same whenever it is run.
     month_start = acts.acted_at.max().normalize().replace(day=1) if not acts.empty else None
     n_confirmed = int(
-        ((acts.action_taken == "accepted") & (acts.acted_at >= month_start)).sum()
+        ((acts.action_taken == "dispatched") & (acts.acted_at >= month_start)).sum()
     ) if month_start is not None else 0
 
     reg = data["classification_registry"].set_index("classification_id")
@@ -1270,7 +1269,7 @@ def render_dashboard():
                 sub=f"{len(classified)} classified events")
     with c3:
         kpi("Faults Confirmed This Month", n_confirmed, BLUE,
-            sub=f"Accepted since {month_start:%b 1}" if month_start is not None
+            sub=f"Technicians sent since {month_start:%b 1}" if month_start is not None
                 else "No actions recorded")
     with c4:
         color = RED if exposure > 5000 else AMBER if exposure >= 1000 else GREEN

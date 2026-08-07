@@ -483,7 +483,11 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         rec = reg.loc[t.true_classification_id].recommended_action
         acts.append(
             dict(action_id=f"ACT-{i:04d}", classification_id=None, anomaly_id=t.anomaly_id,
-                 action_taken={"dispatch": "accepted", "monitor": "accepted",
+                 # One verb per outcome, matching what the agent recommends. The
+                 # old scheme collapsed dispatch and monitor into "accepted", so
+                 # once an action was logged you could no longer tell from the
+                 # data whether a technician was actually sent.
+                 action_taken={"dispatch": "dispatched", "monitor": "monitoring",
                                "dismiss": "dismissed"}[rec],
                  acted_at=anomalies.set_index("anomaly_id").loc[t.anomaly_id].detected_at
                  + pd.Timedelta(minutes=float(rng.uniform(6, 40))),

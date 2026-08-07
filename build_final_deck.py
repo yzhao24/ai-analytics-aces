@@ -50,6 +50,25 @@ for sid in list(ids):
     prs.part.drop_rel(sid.rId)
     ids.remove(sid)
 
+
+def strip_slide_numbers(prs):
+    """The Booth master and all seven layouts carry a sldNum placeholder holding a
+    <a:fld type="slidenum"> field. PowerPoint paints those onto every slide that
+    inherits the layout, so clearing the slides alone leaves the 01, 02, ... in
+    place — the field has to come off the master and the layouts."""
+    ns = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
+    removed = 0
+    for part in [prs.slide_master, *prs.slide_layouts]:
+        for shp in list(part.shapes):
+            ph = shp._element.find(f"{ns}nvSpPr/{ns}nvPr/{ns}ph")
+            if ph is not None and ph.get("type") == "sldNum":
+                shp._element.getparent().remove(shp._element)
+                removed += 1
+    return removed
+
+
+strip_slide_numbers(prs)
+
 LY_TITLE, LY_TITLECONTENT, LY_BLANK = 0, 2, 6
 
 

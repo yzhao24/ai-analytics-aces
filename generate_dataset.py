@@ -56,7 +56,7 @@ TEMP_COEF = {"refrigeration": 1.15, "hvac": 2.10, "lighting": 0.0, "other": 0.15
 # Day shift 06:00-14:00, night shift 22:00-06:00 (spec section 12).
 DAY_SHIFT = range(6, 14)
 NIGHT_SHIFT = list(range(22, 24)) + list(range(0, 6))
-SHIFT_KW = {"refrigeration": 6.0, "hvac": 11.0, "lighting": 15.0, "other": 22.0}
+SHIFT_KW = {"refrigeration": 22.0, "hvac": 34.0, "lighting": 30.0, "other": 40.0}
 
 COMPRESSOR_CYCLE_HOURS = 4       # refrigeration duty cycle
 COMPRESSOR_AMPLITUDE_KW = 17.0
@@ -170,7 +170,34 @@ def load_weather(facilities, start, end):
 # ── Clean series ─────────────────────────────────────────────────────────────
 
 
-def clean_series(system, hours, temps, rng):
+def build_schedule(facilities, hours, rng):
+    """One planned-throughput figure per facility per day.
+
+    This is the second signal. Temperature already tells the agent how much load
+    the weather explains; planned throughput tells it how much the business
+    explains. Without it, a busy shift and a stuck compressor are the same
+    observation — more kWh for several hours — and no function of kWh can tell
+    them apart.
+    """
+    days = pd.Index(sorted({d.normalize() for d in hours}))
+    rows = []
+    for f in facilities.itertuples():
+        # Most days sit near plan; a minority are genuine peak-shipping days.
+        base = rng.normal(100, 9, len(days))
+        peaks = rng.random(len(days)) < 0.08
+        base[peaks] += rng.uniform(90, 170, peaks.sum())
+        for d, pct in zip(days, base):
+            weekend = d.dayofweek >= 5
+            rows.append(dict(
+                facility_id=f.facility_id, date=d,
+                day_shift_start="06:00", day_shift_end="14:00",
+                night_shift_start="22:00", night_shift_end="06:00",
+                planned_throughput_pct=round(float(pct) * (0.7 if weekend else 1.0), 1),
+            ))
+    return pd.DataFrame(rows)
+
+
+def clean_series(system, hours, temps, throughput, rng):
     """Consumption with no anomalies: base + shift + weather + duty cycle + noise."""
     t = system.system_type
     hour_of_day = hours.hour.to_numpy()
@@ -178,8 +205,10 @@ def clean_series(system, hours, temps, rng):
 
     level = np.full(len(hours), BASE_KW.get(t, BASE_KW["other"]))
 
+    # Shift load scales with how much work is planned that day. Base load and
+    # weather response do not — a compressor does not care about throughput.
     on_shift = np.isin(hour_of_day, list(DAY_SHIFT)) | np.isin(hour_of_day, NIGHT_SHIFT)
-    level += on_shift * SHIFT_KW.get(t, 0.0)
+    level += on_shift * SHIFT_KW.get(t, 0.0) * (throughput / 100.0)
 
     level += np.clip(temps - 65.0, 0, None) * TEMP_COEF.get(t, 0.0)
 
@@ -189,7 +218,6 @@ def clean_series(system, hours, temps, rng):
     if t in ("other", "lighting"):
         level += np.isin(hour_of_day, FORKLIFT_HOURS) * FORKLIFT_KW
 
-    level *= np.where(weekday >= 5, WEEKEND_SCALE, 1.0)
     level += rng.normal(0, NOISE_FRACTION * level + NOISE_FLOOR_KW)
     return np.clip(level, 0.5, None)
 
@@ -198,7 +226,7 @@ def clean_series(system, hours, temps, rng):
 
 
 def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5,
-                     weather_aware=True):
+                     weather_aware=True, schedule_aware=True):
     """Rolling median at the same hour, weekday, and temperature band.
 
     Mirrors the schema's definition, with one deliberate change: the lookback is
@@ -212,6 +240,7 @@ def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5,
     """
     kwh = frame.kwh.to_numpy()
     temps = frame.temp_f.to_numpy()
+    thru = frame.planned_throughput_pct.to_numpy() if "planned_throughput_pct" in frame else None
     hours = frame.recorded_at.dt.hour.to_numpy()
     dows = frame.recorded_at.dt.dayofweek.to_numpy()
     weekend = dows >= 5
@@ -250,7 +279,15 @@ def rolling_baseline(frame, neighbours=12, lookback_days=90, min_samples=5,
         # and the match then silently drops temperature altogether, leaving a
         # winter baseline against a summer reading. Nearest-neighbour always
         # conditions on temperature as far as the history allows.
-        nearest = pool[np.argsort(np.abs(temps[pool] - temps[i]))[:neighbours]]
+        # Rank candidates by distance in BOTH conditioning variables. Matching
+        # on temperature alone leaves planned throughput free to vary, so a
+        # quiet day is compared against a peak-shipping day and the difference
+        # is charged to the anomaly.
+        dist = np.abs(temps[pool] - temps[i])
+        if schedule_aware and thru is not None:
+            spread = np.std(thru) or 1.0
+            dist = dist / (np.std(temps) or 1.0) + np.abs(thru[pool] - thru[i]) / spread
+        nearest = pool[np.argsort(dist)[:neighbours]]
         out[i] = np.median(kwh[nearest])
     return out
 
@@ -297,10 +334,18 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         for fid, g in weather.groupby("facility_id")
     }
 
+    schedule = build_schedule(facilities, hours, rng)
+    # hour-resolution throughput per facility, for generation and for baselining
+    tp = {}
+    for fid, g in schedule.groupby("facility_id"):
+        by_day = g.set_index("date").planned_throughput_pct
+        tp[fid] = pd.Series(hours.normalize(), index=hours).map(by_day).to_numpy()
+
     # 1. clean consumption per system
     series = {}
     for s in systems.itertuples():
-        series[s.system_id] = clean_series(s, hours, wide[s.facility_id], rng)
+        series[s.system_id] = clean_series(s, hours, wide[s.facility_id],
+                                           tp[s.facility_id], rng)
 
     thresholds = facilities.set_index("facility_id")
 
@@ -358,6 +403,12 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         needs_heat = "CT-010" in ct_ids
         temps_here = wide[host.facility_id]
         hot = np.percentile(temps_here, 85)
+        # A peak-shipping day only exists on a day the plan says is busy. Placing
+        # one on an ordinary day makes it unexplainable by the schedule, which is
+        # the opposite of what the case is for.
+        needs_volume = "CT-008" in ct_ids
+        thru_here = tp[host.facility_id]
+        busy = np.percentile(thru_here, 88)
 
         for _ in range(200):
             at = usable[rng.integers(len(usable))]
@@ -366,6 +417,13 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
             if taken[host.system_id] & set(range(idx - 6, idx + span + 6)):
                 continue
             if needs_heat and temps_here[idx] < hot:
+                continue
+            if needs_volume and thru_here[idx] < busy:
+                continue
+            # The co-occurring stratum is the real exam: a fault that happens
+            # while the plan already explains part of the load. If the schedule
+            # is quiet, the case is no harder than an ordinary fault.
+            if stratum == "co_occurring" and thru_here[idx] < np.percentile(thru_here, 70):
                 continue
             break
         else:
@@ -379,7 +437,16 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         # off a low-consumption meter can land under the alert threshold and never
         # be detected. Floor it so the case reaches the test set — except in the
         # sub-threshold stratum, where being marginal is the whole point.
-        if stratum != "sub_threshold":
+        explained_by_plan = {"CT-008", "CT-009", "CT-011"} & set(ct_ids)
+        if explained_by_plan:
+            # Size it to the volume the plan actually calls for, so the schedule
+            # can account for it. An operational event larger than its own
+            # explanation is a fault wearing an operational label.
+            excess = max(thru_here[idx] - 100.0, 8.0) / 100.0
+            magnitude = SHIFT_KW.get(host.system_type, 22.0) * excess * 2.2
+        elif "CT-010" in ct_ids:
+            magnitude = level * 0.9          # temperature shape scales it below
+        elif stratum != "sub_threshold":
             magnitude = max(magnitude, 3.0 * float(thresholds.loc[host.facility_id]
                                                    .spike_kwh_threshold))
 
@@ -402,6 +469,7 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
                     facility_id=s.facility_id, system_id=s.system_id,
                     recorded_at=hours, kwh=np.round(series[s.system_id], 2),
                     temp_f=np.round(wide[s.facility_id], 1),
+                    planned_throughput_pct=np.round(tp[s.facility_id], 1),
                 )
             )
             for s in systems.itertuples()
@@ -414,7 +482,7 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
     detected = []
     for sid, g in readings.groupby("system_id", sort=False):
         g = g.sort_values("recorded_at").reset_index(drop=True)
-        g["baseline_kwh"] = rolling_baseline(g, weather_aware=False)
+        g["baseline_kwh"] = rolling_baseline(g, weather_aware=False, schedule_aware=False)
         cfg = thresholds.loc[g.facility_id.iloc[0]]
         # Nothing is monitored until a full lookback of history exists — before
         # that the baseline is built from too few readings and flags ordinary
@@ -526,6 +594,7 @@ def build(months, n_core, n_co, n_sub, seed, out_path):
         systems.to_excel(w, sheet_name="system_registry", index=False)
         registry.to_excel(w, sheet_name="classification_registry", index=False)
         readings.to_excel(w, sheet_name="energy_readings", index=False)
+        schedule.to_excel(w, sheet_name="shift_schedule", index=False)
         anomalies.to_excel(w, sheet_name="anomalies", index=False)
         classifications.to_excel(w, sheet_name="classifications", index=False)
         actions.to_excel(w, sheet_name="manager_actions", index=False)

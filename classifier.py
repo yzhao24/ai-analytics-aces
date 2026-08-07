@@ -55,10 +55,28 @@ independent of shift boundaries.
 extended hours past a shift boundary, or load that scales with outdoor \
 temperature on a hot day. Weather-driven HVAC load at high temperatures is \
 expected behaviour, not a fault.
+
 - Data anomalies are physically implausible: readings many times the historical \
 maximum, or a near-zero reading followed by a compensating spike. Magnitude alone \
 is the tell — a spike far larger than the plant can physically draw is a metering \
 artefact, not a bigger fault.
+
+Use the planned operations block symmetrically. It can argue for either \
+answer and you should let it do both.
+
+It argues for operational variation when the timing and the size line up with \
+the plan: the excess sits inside a shift the plan covers, and it is roughly the \
+size the volume increase would predict — a day planned at 150% of normal should \
+draw about half again as much during that shift. Load that tracks the plan is \
+the plant doing its job.
+
+It argues for equipment fault when the plan cannot account for the excess: load \
+outside every planned shift, load far larger than the volume increase would \
+explain, or load on a sub-system that does not scale with throughput at all, \
+such as refrigeration holding temperature overnight.
+
+A quiet day is evidence too. If the plan says today is light and consumption is \
+high anyway, the business is not the explanation.
 
 Telling a one-hour equipment fault from a one-hour metering artefact is the \
 hardest call here, and shape alone will not do it. Ask whether the plant could \
@@ -194,6 +212,44 @@ def spike_profile(readings, anomaly):
     )
 
 
+def schedule_context(data, anomaly):
+    """What the plan says about this hour — the second conditioning signal.
+
+    Temperature says how much load the weather explains. Planned throughput says
+    how much the business explains. Without it, a busy shift and a stuck
+    compressor are the same observation.
+    """
+    sched = data.get("shift_schedule")
+    if sched is None or sched.empty:
+        return "  (no shift schedule available for this facility)"
+
+    day = pd.to_datetime(sched.date).dt.normalize()
+    row = sched[(sched.facility_id == anomaly.facility_id)
+                & (day == anomaly.detected_at.normalize())]
+    if row.empty:
+        return "  (no shift schedule recorded for this date)"
+    r = row.iloc[0]
+
+    fac = sched[sched.facility_id == anomaly.facility_id].planned_throughput_pct
+    pct = float(r.planned_throughput_pct)
+    rank = (fac < pct).mean()
+    busy = ("an unusually busy day" if rank >= 0.88 else
+            "a quiet day" if rank <= 0.15 else "an ordinary day")
+
+    h = anomaly.detected_at.hour
+    on_day = 6 <= h < 14
+    on_night = h >= 22 or h < 6
+    where = ("inside the day shift" if on_day else
+             "inside the night shift" if on_night else
+             f"outside both shifts (day ends 14:00, night starts 22:00)")
+
+    return (f"  Day shift        : {r.day_shift_start}-{r.day_shift_end}\n"
+            f"  Night shift      : {r.night_shift_start}-{r.night_shift_end}\n"
+            f"  Planned volume   : {pct:.0f}% of normal — {busy} "
+            f"({rank:.0%} of days this year are lighter)\n"
+            f"  This hour falls  : {where}")
+
+
 def build_prompt(data, anomaly, system):
     sys_name = system.system_name if system is not None else "unknown sub-system"
     sys_type = system.system_type if system is not None else "unknown"
@@ -207,6 +263,9 @@ def build_prompt(data, anomaly, system):
   Peak            : {peak:.1f} kWh/hr  ({multiple:.1f}x baseline, +{anomaly.spike_kwh:.1f} above)
   Duration        : {int(anomaly.duration_minutes)} minutes
   Outdoor temp    : {anomaly.temp_f_at_detection:.1f}F
+
+PLANNED OPERATIONS FOR THIS DAY
+{schedule_context(data, anomaly)}
 
 CONSUMPTION, 3 HOURS EITHER SIDE
 {spike_profile(data['energy_readings'], anomaly)}

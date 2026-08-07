@@ -13,6 +13,8 @@ import json
 import math
 from pathlib import Path
 
+import input_guard
+
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -759,6 +761,61 @@ ano_all = build_anomaly_view().copy()
 ano_all["status"] = ano_all.apply(
     lambda r: st.session_state.status_overrides.get(r.anomaly_id, r.status), axis=1
 )
+
+
+# ── Input guard ───────────────────────────────────────────────────────────────
+
+GUARD_COLOR = {"blocker": RED, "warning": AMBER, "note": BLUE}
+
+
+def render_findings(findings):
+    for f in findings:
+        c = GUARD_COLOR[f.severity]
+        st.markdown(
+            f'<div class="card" style="border-left:4px solid {c};margin-bottom:8px">'
+            f'<span class="badge" style="background:{c};color:#fff">{f.severity.upper()}</span>'
+            f'<span style="margin-left:9px;font-weight:600">{f.message}</span>'
+            + (f'<div class="muted" style="margin-top:6px">{f.detail}</div>' if f.detail else "")
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+
+
+@st.dialog("Check this data before you rely on it", width="large")
+def input_warning_dialog(findings, source):
+    worst = input_guard.worst_severity(findings)
+    lead = ("Something in this feed looks wrong enough that the classifications "
+            "below may be meaningless."
+            if worst == "blocker" else
+            "A few things in this feed are worth a look before you act on it.")
+    st.markdown(f'<div class="muted" style="margin-bottom:10px">{lead}<br>'
+                f'<b>Source:</b> {source}</div>', unsafe_allow_html=True)
+    render_findings(findings)
+    st.caption("These are prompts to check, not rejections. Nothing has been discarded.")
+    if st.button("I have checked — continue", width="stretch"):
+        st.session_state.guard_ack = True
+        st.rerun()
+
+
+@st.cache_data
+def guard_loaded_data():
+    """Sanity-check the workbook the dashboard is running on."""
+    d = load_data()
+    readings = d["energy_readings"]
+    # Profile the settled history and test the most recent slice against it, so
+    # a feed that drifted partway through is still caught.
+    cutoff = readings.recorded_at.max() - pd.Timedelta(days=14)
+    history, recent = readings[readings.recorded_at < cutoff], readings[readings.recorded_at >= cutoff]
+    if history.empty or recent.empty:
+        return []
+    return [f for f in input_guard.check_readings(
+        recent, input_guard.baseline_profile(history), d) if f.code != "overlap"]
+
+
+st.session_state.setdefault("guard_ack", False)
+_startup_findings = guard_loaded_data()
+if _startup_findings and not st.session_state.guard_ack:
+    input_warning_dialog(_startup_findings, f"{DATA_FILE.name} — most recent 14 days")
 
 
 # ── Sidebar nav ───────────────────────────────────────────────────────────────
@@ -1579,6 +1636,35 @@ def render_settings():
             prefs,
             index=prefs.index(cfg.notification_pref),
         )
+
+    # ── Import a meter export and check it before trusting it
+    section("Import Meter Data")
+    st.markdown(
+        '<div class="muted">Upload an hourly export from the smart meter or BMS. '
+        'It is checked against this facility\'s history and any problems are shown '
+        'before the data is used — nothing is overwritten.</div>',
+        unsafe_allow_html=True,
+    )
+    up = st.file_uploader("CSV with facility_id, system_id, recorded_at, kwh",
+                          type=["csv"], label_visibility="collapsed")
+    if up is not None:
+        try:
+            incoming = pd.read_csv(up)
+        except Exception as exc:
+            st.error(f"Could not read the file: {exc}")
+        else:
+            findings = input_guard.check_readings(
+                incoming, input_guard.baseline_profile(data["energy_readings"]), data)
+            st.caption(f"{len(incoming):,} rows read from {up.name}")
+            if not findings:
+                st.success("No problems found. This feed matches the shape of the "
+                           "existing database.")
+            else:
+                worst = input_guard.worst_severity(findings)
+                (st.error if worst == "blocker" else st.warning)(
+                    f"{len(findings)} thing(s) to check before relying on this import."
+                )
+                render_findings(findings)
 
     if st.button("Save Settings", width="content"):
         st.success(

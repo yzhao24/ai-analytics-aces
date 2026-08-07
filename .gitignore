@@ -32,3 +32,6 @@ secrets.json
 weather_cache.csv
 sample_bad_export.csv
 usability_rater_*.csv
+
+# Presentation build input (Booth master, converted from .potx)
+booth_template.pptx

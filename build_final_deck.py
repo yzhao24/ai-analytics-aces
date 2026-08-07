@@ -52,16 +52,22 @@ for sid in list(ids):
 
 
 def strip_slide_numbers(prs):
-    """The Booth master and all seven layouts carry a sldNum placeholder holding a
-    <a:fld type="slidenum"> field. PowerPoint paints those onto every slide that
-    inherits the layout, so clearing the slides alone leaves the 01, 02, ... in
-    place — the field has to come off the master and the layouts."""
+    """Remove the page numbers the Booth template paints on every slide.
+
+    They come from two different mechanisms and both have to go. The master and
+    layouts carry sldNum placeholders holding a <a:fld type="slidenum"> field;
+    separately, layouts 3-6 carry an ordinary text shape with the literal string
+    "01" sitting in the footer band. Only the second one is what actually shows
+    on a Blank-layout slide, and it is invisible to any search for a field."""
     ns = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
     removed = 0
     for part in [prs.slide_master, *prs.slide_layouts]:
         for shp in list(part.shapes):
             ph = shp._element.find(f"{ns}nvSpPr/{ns}nvPr/{ns}ph")
-            if ph is not None and ph.get("type") == "sldNum":
+            is_field = ph is not None and ph.get("type") == "sldNum"
+            is_literal = (shp.has_text_frame
+                          and shp.text_frame.text.strip().isdigit())
+            if is_field or is_literal:
                 shp._element.getparent().remove(shp._element)
                 removed += 1
     return removed

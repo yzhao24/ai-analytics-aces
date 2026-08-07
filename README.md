@@ -190,9 +190,26 @@ alarm. It also leaves the test set with an 80% fault base rate, which is why no
 dispatch policy can beat dispatching on everything.
 
 **Operational variation is still confused with equipment fault.** The remaining core
-errors are Peak Throughput Day and Temporary Equipment Rental read as faults. Neither
-a sharper prompt nor a better baseline moved them, which supports the argument that
-shift schedule data is the missing input rather than better modelling.
+errors are Peak Throughput Day and Temporary Equipment Rental read as faults.
+
+We tried the obvious fix and it did not work. The reasoning was sound: an hourly meter
+measures one number, and a busy shift and a stuck compressor both produce "more kWh for
+several hours", so no function of kWh alone can separate them. Temperature already
+supplies a second signal, which is why the weather-driven case is classified correctly
+and dismissed at z = −0.04. Planned throughput should do the same for operational
+variation.
+
+It runs into a threshold conflict. A day planned at 130% of normal adds 7–10 kWh to a
+sub-system; the alarm fires at 20. So a realistic busy day never reaches the detector,
+and any operational event large enough to alarm is by construction larger than its own
+explanation — at which point calling it a fault is correct, not a mistake. Sizing the
+events down to what the plan predicts made them undetectable and collapsed the test set.
+
+Either the alert threshold drops far enough to surface ordinary operational variation,
+which floods the queue, or the three-class scheme collapses toward two above the alarm
+line. That is a specification decision, not a prompt or feature-engineering one. The
+full experiment, with measurements at each step, is on the `experiment/shift-schedule`
+branch.
 
 **Two classification types never appear** in the current test set (CT-009, CT-014).
 

@@ -26,16 +26,7 @@ with the statistical evidence behind the call.
 | **Evaluation** | |
 | `score_rubric.py` | Scores the Assignment 2 rubric and the decision value |
 | `stability_test.py` | Repeat runs and bias breakdown → `stability_runs.json` |
-| `usability_test.py` | Rater sheets, scoring, and the optional LLM judge → `usability_judge.json` |
-| `usability_cases.md` | The blind rating pack handed to two human raters |
-| `verify_review_numbers.py` | Reproduces the figures cited in the adversarial reviews |
-| **Deliverables** | |
-| `build_assignment2_docx.py` | Group Assignment 2 as a 5-page Word document |
-| `build_final_deck.py` | The final presentation, on the Booth master |
-| `build_speech_doc.py` | The speaking script as cue cards, one page per speaker |
-| `speaker_notes.py` | The spoken script and its timing — the source both of the above read |
-| `DEMO_SCRIPT.md` | Demo recording script, with every figure verified against the live panel |
-| `appendix_prompt.txt` · `appendix_cases.json` | Generated appendix inputs — do not hand-edit |
+| `usability_test.py` | Rater sheets, scoring, and the optional LLM judge → `usability_judge.json`. `--sheets` writes the blind rating pack |
 | **Specs** | |
 | `wireframe_v2.md` · `data_schema_v2.md` | The specs this was built against |
 

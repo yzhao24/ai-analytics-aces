@@ -1,0 +1,100 @@
+{
+  "ANO-2000": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a specific mechanism (compressor running continuously against a fault) rather than a vague anomaly. Evidence is concrete: ~3x normal load, sustained three hours, 04:00-07:00 timing, cool overnight conditions ruling out weather and staff activity. Next step is fully actionable without further consultation \trication trade, Zone A, lead compressor and controls, specific readings and the exact hour window to pull logs for. The manager-facing explanation is in plain language (\"running flat out\", \"struggling to hold temperature\", \"product temperature excursions\" is borderline but readable); the pressure terminology sits in the technician instruction line and is exempt. Passes all four."
+  },
+  "ANO-2001": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names refrigerant charge loss as the mechanism, not a generic anomaly. Evidence is explicit: steady four-hour climb in power draw, no return to baseline, and rising effort despite falling evening outdoor temperature. Action is directly actionable \\u2014 dispatch a refrigeration technician tonight to Zone B for a leak check. Manager-facing text is plain English; 'suction pressure' and 'verify charge' appear only in the technician dispatch line, which is exempt."
+  },
+  "ANO-2002": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a mechanism \\ccyaining/cycling on the air handling side, specifically the supply fan assembly and motor) rather than a vague anomaly. Evidence is stated concretely: ~3x normal night-time draw, two repeat spikes two hours apart, cool evening when demand should be low, and magnitude within the unit's physical capacity ruling out a meter error. The action is fully actionable without further consultation \\u2014 dispatch an HVAC mechanic, inspect fan assembly/motor, then filters and damper, attend in the evening near 22:00 and midnight. Language is plain enough for a non-technical manager; 'damper position' and 'air handling side' are mild but readable in context."
+  },
+  "ANO-2003": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a specific mechanism (fan/drive fault causing continuous run without reaching setpoint) rather than a vague anomaly. Evidence is concrete: 4x normal overnight draw, flat for four hours, mild stable outdoor conditions, 04:00 onset with no shift change. Action is directly actionable: dispatch an HVAC tech this morning to a named unit, starting at the supply fan motor, belt and drive controls, and verify continuous running since 04:00. Language is plain; 'setpoint' and 'drive controls' are mild but readable in context for a non-technical manager. All four criteria met."
+  },
+  "ANO-2004": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a specific mechanism (stuck relay / override / schedule conflict switching many lighting zones on at once) rather than a generic anomaly. Cites the evidence clearly: several times normal load, single hour, Saturday morning, abrupt return to normal, no metering gap, and notes it stays within circuit capacity. The action is fully actionable without further consultation \for Lheduleding Grid South, override log around Saturday 10:00, hourly watch for 24h, numeric thresholds of ~90 and ~40 kWh/hr, escalate to an electrician. Language is plain enough for a non-technical manager; 'stuck relay' and 'kWh/hr' are common-usage terms and the surrounding explanation makes the meaning clear. Passes all four."
+  },
+  "ANO-2005": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "The explanation leans on a slightly soft phrase (\"cooling system losing efficiency\"), but the dispatch line pins it to a refrigerant charge/leak check, so a specific mechanism does come through. Evidence is well stated: steady three-hour climb, cool Sunday evening, no throughput or weather driver, plus an explicit rule-out of a metering fault on magnitude and duration grounds. The action is fully self-contained \u2014 named trade, named zone, tonight, specific components to inspect, and a specific log window (20:00-23:00). Terms like evaporator and charge level sit in the technician-facing instruction and read as ordinary dispatch language; the manager-facing paragraph stays plain. Passes all four."
+  },
+  "ANO-2006": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a specific mechanism (lighting control system misfiring, leaving banks energised outside schedule, plus possible metering artefact) rather than a vague anomaly. Evidence is stated concretely: a single-hour spike above normal evening draw, followed by two hours at roughly double normal instead of dropping off overnight, with named thresholds (90 kWh at 20:00, 28-30 kWh vs ~12 kWh baseline). The next step is fully actionable without consulting anyone \\u2014 track the named circuit hourly for 24 hours, watch the 20:00 hour and 22:00-23:00 window, escalate to an electrical callout if thresholds repeat. Language is plain; 'energised', 'metering artefact' and 'kWh' are all readable by a non-technical manager in context. All four criteria pass."
+  },
+  "ANO-2007": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a concrete mechanism (timer/schedule fault or stuck relay leaving lighting banks energised) rather than a generic anomaly. Evidence is specific: roughly 3x normal night-time load, confined to a single hour, then a return to baseline, plus the reasoning that the magnitude is within circuit capacity so it is real consumption not a meter error. The action is fully self-contained: watch the 23:00 hour for 24 hours, flag anything above ~60 kWh/hr, and pull schedule and relay logs if it repeats. Language is plain; 'stuck relay' and 'energised' are understandable in context for a non-technical reader. Passes all four."
+  },
+  "ANO-2008": {
+    "names_cause": false,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Evidence is well described \\and-hold, 4x normal draw, four hours, mild outdoor conditions, no occupancy correlation \\ and the action is fully actionable: a trade, a specific unit, a starting component, a timeframe, and a check to perform. The weak point is the cause: 'a mechanical problem in the air-handling side' is a category, not a mechanism \\ no bearing failure, belt slip, blocked filter, or seized damper is named, so the reader is left to infer why the fan is the suspect. Language is otherwise plain enough for a non-technical manager; 'amp draw against nameplate' sits in the technician instruction and reads as acceptable there."
+  },
+  "ANO-2009": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a concrete mechanism (compressors running continuously rather than cycling, not reaching cut-out) rather than a vague anomaly. Evidence is specific: roughly double normal draw, sustained eight hours, held high even as outdoor temperature dropped and demand should have eased. Action is directly actionable: dispatch a refrigeration technician to the compressor bank tonight or tomorrow morning, with named checks. The manager-facing explanation is plain language throughout; the pressure/cut-out terminology is confined to the technician dispatch instruction, so it does not obstruct a non-technical reader. Passes all four."
+  },
+  "ANO-2010": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names the mechanism (overnight air-conditioning load decaying as outdoor temperature drops) rather than vaguely citing an anomaly, and supports it with the shape of the curve: the flagged hour is below the preceding hours, the evening declines steadily, and there is no step change or upward climb. The action is concrete and self-contained \night nights load on HVAC Unit 1 for the 17 July overnight window, record the elevated evening temperatures, and suppress re-flagging of that midnight hour next month. Language is plain enough for a non-technical manager; 'sustained level' and 'HVAC Unit 1' are self-explanatory. Passes all four."
+  },
+  "ANO-2011": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a mechanism (supply fan unable to move air, unit running continuously) rather than a generic anomaly. Evidence is concrete: the sharp overnight jump, five sustained hours, falling outdoor temperature and empty building. The action is fully actionable without follow-up questions \\u2014 dispatch an HVAC tech, inspect the supply fan assembly, check motor amp draw and belt condition. The manager-facing paragraph is plain English; the only technical terms (amp draw, call for cooling) sit in the technician instruction line, which is exempt. Passes all four."
+  },
+  "ANO-2012": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a concrete mechanism (meter failed to report for one hour and rolled the missing consumption into the next read) rather than labelling it an anomaly. Evidence is specific and shaped: near-zero usage in the prior hour on a circuit known to be on, the missing amount reappearing in the following reading, and an immediate return to normal. The action is fully actionable without follow-up questions \\u2014 name the circuit, the exact date and hour window, exclude from next month's review, and route a comms-reliability check to the metering team. Language stays plain; 'meter dropout' appears only after the plain-English description of the same thing, so a non-technical reader follows it. Passes all four.\"}"
+  },
+  "ANO-2013": {
+    "names_cause": true,
+    "states_evidence": true,
+    "specific_next_step": true,
+    "avoids_jargon": true,
+    "comment": "Names a concrete mechanism (a meter misread rather than real equipment behaviour) and argues it from the data shape: a single-hour 6x spike with no ramp-up, no elevated draw afterwards, and no trace in surrounding hours on a cold night. The action is fully self-contained \\u2014 log the specific 02:00 Tue 16 Dec reading as an isolated spike, exclude it from next month's exception review, and flag the meter if a second outlier appears. Language is plain; 'heating and cooling unit' is spelled out and the only shorthand is HVAC in the action line, which is standard for an operations manager. All four criteria met."
+  }
+}

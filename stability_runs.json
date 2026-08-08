@@ -1,0 +1,386 @@
+[
+  {
+    "ANO-2000": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.78,
+      "explanation_text": "Refrigeration load jumped to roughly three times its normal overnight level and stayed there for three straight hours before dropping back, with no change in outdoor conditions and no activity on site to explain it. A sustained plateau like this points to the cooling equipment running continuously because it cannot hold the zone at temperature. The size of the increase is well within what the zone can physically draw, so this is a real fault rather than a meter error.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone A today to inspect the lead compressor and its controls, starting with suction and discharge pressures and whether the unit is short-cycling or locked in continuous run.",
+      "symptom_to_check": "Compressor running continuously without satisfying setpoint on Zone A; check suction/discharge pressures, superheat and subcooling, compressor amp draw against nameplate, head pressure and condenser fan operation, and whether the unit is short-cycling or the contactor is stuck in."
+    },
+    "ANO-2001": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.72,
+      "explanation_text": "Power draw on this refrigeration zone climbed steadily over four hours and never settled back down, even as the outdoor temperature dropped in the evening. That combination \u2014 rising effort while conditions get easier \u2014 points to the cooling system losing capacity and having to run harder to hold temperature. Left alone this will keep worsening and put product at risk.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone B this evening to check refrigerant charge and superheat/subcooling on the circuit before overnight hours.",
+      "symptom_to_check": "Progressive loss of cooling capacity with extended or continuous compressor run time: check for low suction pressure, high superheat, low subcooling, frosted or starved evaporator coil, and oily residue at joints, valves and line-set connections indicating refrigerant loss; verify condenser is clean and door seals are intact to rule out added heat load."
+    },
+    "ANO-2002": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.62,
+      "explanation_text": "The unit jumped to nearly three times its normal night-time draw, dropped back, then did the same thing again two hours later. It was a cool evening with the building unoccupied, so there is no comfort or weather reason for the unit to work that hard, and the on-off pattern points to something in the air handler struggling to start or run properly rather than a billing or metering glitch. Repeating high-current episodes like this usually get worse and can end in a failed motor.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to HVAC Unit 2 tonight or first thing tomorrow and have them check the supply fan motor and its starter/VFD, focusing on why the unit is drawing heavy current during unoccupied night hours.",
+      "symptom_to_check": "Intermittent high amp draw on the supply fan motor during unoccupied hours \u2014 check for a seizing or dragging fan bearing, belt slippage, motor short-cycling or hard restarts, and compare running amps against nameplate FLA; also verify the VFD/starter and night setback schedule are not forcing the fan to full speed."
+    },
+    "ANO-2003": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.83,
+      "explanation_text": "The unit jumped to nearly four times its normal overnight draw and stayed there flat for four hours, with no drop back toward normal. Outdoor conditions were mild and unchanging overnight, so there is nothing in the weather or the schedule to explain it, and the load is well within what the unit could physically draw so it is not a metering error. A sustained step change like this points to an HVAC component running hard and continuously, most likely a fan or drive stuck in full-load operation.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to HVAC Unit 1 this morning and have them check the supply fan motor and VFD/drive status first, along with belt condition and whether the unit is locked into continuous full-speed operation overnight.",
+      "symptom_to_check": "Supply fan running continuously at full speed with the drive failing to modulate; check for motor amp draw above nameplate, seized or dragging bearings, slipping or shredded belt, and whether the unit is stuck in a manual override or failed-open damper condition preventing it from cycling off overnight."
+    },
+    "ANO-2004": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.56,
+      "explanation_text": "The south lighting circuit drew roughly four and a half times its normal mid-morning load for a single hour, then dropped straight back to normal with no gradual build-up and no link to the cold weather. That pattern is typical of a lighting control system briefly switching a whole zone on, or failing to switch it off, rather than a genuine change in site activity. It is a plausible draw for a lighting circuit, so it should be treated as a possible control fault rather than a bad reading, but a single isolated hour is not yet enough to justify a call-out.",
+      "recommended_action": "monitor",
+      "next_action": "Watch Lighting Grid South over the next 24 hours for any repeat hour above roughly 60 kWh, especially around the 10:00 slot, and check the lighting control schedule and any manual override for the south zone on Saturday morning.",
+      "symptom_to_check": ""
+    },
+    "ANO-2005": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.68,
+      "explanation_text": "The refrigeration load climbed steadily over three consecutive evening hours to about four times its normal level before dropping back, and it did so on a quiet Sunday night when outdoor conditions were mild and cooling demand should have been falling. A progressive rise like this points to the cooling system working ever harder to hold temperature rather than to any change in site activity. The most likely cause is a loss of refrigerant charge leaving the plant unable to reach setpoint efficiently.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone A to check refrigerant charge and look for oil traces or leaks at joints, valves and the evaporator coil, and review the zone's overnight temperature log against setpoint.",
+      "symptom_to_check": "Low refrigerant charge: check suction pressure and superheat, sight glass for flash gas, and extended or continuous compressor run time with the zone failing to pull down to setpoint; leak-test joints, valve stems and evaporator coil for oil residue."
+    },
+    "ANO-2006": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.66,
+      "explanation_text": "The lighting circuit appears to have drawn eight times its normal load for a single hour and then returned to normal immediately. A lighting grid cannot physically consume that much more than when all its fixtures are already on, so this reading is far beyond what the circuit could actually pull. The pattern points to a bad reading from the meter rather than any problem with the lights themselves.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 20:00 Thursday reading on Lighting Grid North as a single-hour meter spike artefact so it is excluded from next month's review, and ask the metering vendor to confirm no calibration or wiring issue on that channel. Separately note the mildly higher 22:00-23:00 lighting use as normal late-evening activity.",
+      "symptom_to_check": ""
+    },
+    "ANO-2007": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.68,
+      "explanation_text": "The south lighting circuit drew roughly three times its normal night-time level for a single hour late in the evening, then settled straight back to its usual overnight level. That size of jump is well within what a lighting circuit can physically draw, so the reading is credible rather than a meter error, and the mild evening temperature rules out any weather-related cause. The most likely explanation is that a lighting zone or schedule failed to switch down on time and briefly ran additional banks at full output.",
+      "recommended_action": "monitor",
+      "next_action": "Have the building management system logs for Lighting Grid South pulled for the 22:00-00:00 window and watch the same circuit over the next 24 hours; a repeat of roughly 90 kWh/hr at or near 23:00 confirms a stuck lighting schedule or failed zone relay and should then be escalated to a controls electrician.",
+      "symptom_to_check": ""
+    },
+    "ANO-2008": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.79,
+      "explanation_text": "The unit jumped to nearly four times its normal draw within a single hour and then held there for four straight hours with no sign of easing. Outdoor conditions were mild and cooling, so there is no weather or workload reason for the unit to work harder. A step change that locks in at a high level like this points to the air-moving side of the unit failing and the system running flat out to compensate.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 2's supply fan assembly, motor and drive belt, and confirm whether the unit has been running continuously since 06:00.",
+      "symptom_to_check": "Supply fan not moving design airflow \u2014 check for seized or failed fan motor, slipping/broken belt, bearing noise, tripped VFD or motor running locked-rotor, and confirm low airflow across the coil with the unit in continuous run and elevated amp draw."
+    },
+    "ANO-2009": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.79,
+      "explanation_text": "The refrigeration compressors jumped to roughly double their normal draw and stayed there for a full eight hours overnight, with no sign of returning to normal. Outdoor temperatures were falling during that window and the site was past the busy part of the day, so neither weather nor workload explains the extra load. A sustained overnight plateau like this usually means the compressors are running continuously because they can no longer hold the set temperature.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to the compressor bank tonight to check whether the compressors are short-cycling or running continuously, and verify suction/discharge pressures and head pressure against the case temperatures.",
+      "symptom_to_check": "Compressors running continuously without cycling off; check suction and discharge pressures, superheat and subcooling, condenser approach temperature, and whether case/room temperature is holding setpoint. Note any signs of a failing valve, dirty condenser coil, or low refrigerant charge."
+    },
+    "ANO-2010": {
+      "top_level_class": "operational_variation",
+      "classification_type_id": "CT-010",
+      "confidence_score": 0.68,
+      "explanation_text": "The flagged hour sits comfortably below the evening's earlier readings and forms part of a smooth, gradually declining curve as the outdoor air cools overnight. There is no sudden step up and no plateau above the surrounding hours, which is what a failing fan or blocked filter would produce. This is the cooling system working harder than usual for the small hours simply because it is an unusually warm summer night.",
+      "recommended_action": "dismiss",
+      "next_action": "Log this as expected warm-night HVAC carryover on HVAC Unit 1 during the July heat spell so the same overnight hour is not re-flagged; consider widening the overnight baseline for temperatures above the mid-70s.",
+      "symptom_to_check": ""
+    },
+    "ANO-2011": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.76,
+      "explanation_text": "The unit's power draw jumped sharply just after midnight and then stayed at roughly double its normal level for several hours instead of settling back down. This happened while it was cool outside and getting cooler, and overnight with no activity in the building, so there is no cooling demand or shift activity that would explain it. A step change that holds steady like this points to air-moving equipment struggling or running continuously rather than a normal load variation.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 3's supply fan assembly and control interlocks, starting with whether the fan is locked in continuous run and drawing high amps.",
+      "symptom_to_check": "Supply fan on HVAC Unit 3 running continuously overnight with elevated motor amp draw \u2014 check for seized or dragging bearings, slipping or misaligned belt, blade imbalance, and whether the VFD or fan control is stuck at full speed with the unit failing to cycle off on satisfied setpoint."
+    },
+    "ANO-2012": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-012",
+      "confidence_score": 0.92,
+      "explanation_text": "The hour before the spike recorded almost no usage at all, and the following hour carried roughly the missing amount on top of normal usage. Lighting then returned immediately to its usual level. This is the meter failing to record for one hour and catching up in the next, not a change in how much power the lights actually used.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 07:00-08:00 Friday 13 March reading on Lighting Grid South as a meter dropout with catch-up in the following hour, and flag the pair as excluded so the 128 kWh figure is not re-investigated in next month's review; ask metering to check the logger's clock and comms if the zero-reading pattern repeats.",
+      "symptom_to_check": ""
+    },
+    "ANO-2013": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.72,
+      "explanation_text": "The reading jumped to six times what this air handling unit normally draws for a single hour in the middle of a cold night, then returned exactly to its previous level with no ramp up or settling period. A real mechanical problem would leave some trace in the hours either side, and the unit is not physically capable of drawing that much power at low overnight demand. This has the signature of a bad reading from the meter rather than an actual change in the equipment.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 02:00 Tuesday reading on HVAC Unit 1 as a single-hour metering artefact so it is excluded from next month's exception review, and flag the meter channel for the next scheduled calibration check.",
+      "symptom_to_check": ""
+    }
+  },
+  {
+    "ANO-2000": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.82,
+      "explanation_text": "Refrigeration load jumped to roughly three times normal and stayed there for three straight hours in the middle of the night, then dropped back sharply. There was no activity in the building and the weather was mild, so nothing operational explains it, and the size of the rise is well within what this equipment can physically draw, so it is not a metering error. A sustained overnight run at this level points to a compressor running continuously and failing to reach its target temperature.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone A today to inspect the lead compressor and its control cycling, starting with suction/discharge pressures and whether the unit is short-cycling or running non-stop.",
+      "symptom_to_check": "Compressor running continuously without cutting out overnight \u2014 check suction and discharge pressures, superheat, condenser coil and fan operation, and whether zone temperature is holding setpoint or drifting while the unit runs."
+    },
+    "ANO-2001": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.72,
+      "explanation_text": "Power draw on this refrigeration zone climbed steadily over four hours and never came back down, even as the outside air cooled off. That combination means the units are running harder and harder to hold temperature rather than responding to the weather or to workload, which points to a loss of cooling capacity inside the system. Left alone this will keep worsening and puts stored product at risk.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone B tonight to check refrigerant charge and superheat/subcooling on the circuit that has been running continuously since 16:00.",
+      "symptom_to_check": "Suspected low refrigerant charge: check for extended or continuous compressor run time with poor pull-down, low suction pressure with high superheat, frosting at the evaporator inlet only, sight-glass bubbling, and oil traces at joints, valve cores and brazed connections; confirm charge against subcooling and leak-test the circuit."
+    },
+    "ANO-2002": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.58,
+      "explanation_text": "This unit jumped to nearly three times its normal night-time draw, dropped back, then did it again two hours later, all while the weather outside was cold and the building was closed. A load that repeats like that overnight with no occupancy or heat demand to explain it points to the air-handling side of the unit straining and cycling rather than normal running. Because it has already recurred once, it is likely to keep recurring and worsen if left alone.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 2's supply fan assembly and motor first, focusing on why the unit is drawing heavy current in unoccupied overnight hours around 22:00 and 00:00.",
+      "symptom_to_check": "Supply fan motor drawing high amps on start and cycling repeatedly overnight - check for seized or dragging bearings, loose or slipping belt, unbalanced blower wheel, and fan motor overload tripping and resetting; verify airflow across the coil and static pressure against nameplate."
+    },
+    "ANO-2003": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.82,
+      "explanation_text": "Overnight HVAC load jumped almost four times its normal level and then held flat for four straight hours with no sign of returning to normal. Outdoor conditions were mild and unchanging, so there is no cooling demand to explain it, and the load did not follow any shift or business activity. A step change that locks in and stays there points to a mechanical failure in the air handling unit forcing it to run hard continuously.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 1's supply fan and motor, starting with fan motor amp draw and belt/bearing condition against nameplate values.",
+      "symptom_to_check": "Supply fan running continuously at full load with elevated motor amp draw; check for seized or dragging bearings, slipping or broken belt, locked-rotor/overheating motor, and whether the unit is stuck in a forced full-speed or hand override with dampers closed causing high static pressure."
+    },
+    "ANO-2004": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.61,
+      "explanation_text": "The south lighting circuit drew several times its normal load for a single hour on a Saturday morning, then fell straight back to normal with no lead-in or lingering effect. That pattern fits a lighting control or timer fault that briefly energised circuits that should have been off or dimmed, rather than anything driven by weather or weekend activity. It is large enough that a metering artefact cannot be ruled out, so the next occurrence will settle which it is.",
+      "recommended_action": "monitor",
+      "next_action": "Watch Lighting Grid South over the next 24 hours, specifically the mid-morning hours around 10:00, for any repeat reading above roughly 60 kWh/hr; if it recurs, pull the lighting control panel schedule and relay logs for that hour before dispatching an electrician.",
+      "symptom_to_check": ""
+    },
+    "ANO-2005": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.62,
+      "explanation_text": "Power draw on the chilled zone climbed steadily over three evening hours, roughly quadrupling, at a time when the site was quiet and the weather was cool \u2014 so nothing outside the equipment explains it. A cooling system that has to work progressively harder to hold temperature in mild conditions is usually losing refrigerant charge, with door or seal problems the other possibility. The load only fell back after the third hour, which means the unit was struggling rather than briefly surging.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone A before the next operating day to leak-check the circuit and verify charge; also have them confirm door seals and closure on the zone while on site.",
+      "symptom_to_check": "Progressive rise in compressor run time with low suction pressure and high superheat; check for oil traces or bubbling at joints, evaporator coil frosting or starving, and sight-glass flash gas indicating undercharge \u2014 verify door seals and closers as a secondary cause."
+    },
+    "ANO-2006": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.62,
+      "explanation_text": "The lighting circuit appears to have drawn eight times its normal load for a single hour and then returned immediately to normal. A lighting grid has a fixed number of fixtures and simply cannot physically draw that much power, so the reading is almost certainly the meter misreporting rather than a real electrical event. The readings either side are consistent and show no sign of anything left running.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 20:00 Thursday reading on Lighting Grid North as a single-hour metering artefact so it is excluded from next month's exception review, and separately note the mildly elevated 22:00-23:00 lighting draw for the site team to confirm against the evening cleaning or dock-lighting schedule.",
+      "symptom_to_check": ""
+    },
+    "ANO-2007": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.68,
+      "explanation_text": "The southern lighting circuit drew roughly triple its normal night-time load for a single hour and then settled straight back to its usual overnight level. That size of jump is well within what the lighting circuit can physically pull, so it looks like lights being switched on or failing to switch off rather than a metering error. The most likely cause is a fault or mis-set schedule in the lighting control system that briefly commanded a large bank of fixtures on.",
+      "recommended_action": "monitor",
+      "next_action": "Watch the Lighting Grid South meter at the 23:00 hour over the next 24 hours; a repeat reading near 90 kWh/hr, or any overnight hour holding above about 55 kWh/hr, confirms a control or timer fault and should trigger an electrical controls callout. In the meantime pull the lighting panel's schedule and override log for Tuesday 23:00.",
+      "symptom_to_check": ""
+    },
+    "ANO-2008": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.82,
+      "explanation_text": "The unit jumped to nearly four times its normal draw within a single hour and then stayed there for four hours without easing back, which is the signature of a mechanical failure rather than a normal load change. Outdoor conditions were mild, so there is no cooling demand that could explain the extra power. Something inside the unit is running hard and continuously, and it will keep burning energy until it is inspected.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to HVAC Unit 2 this morning and have them check the supply fan motor and drive first, since the unit has been locked at roughly 3.7x normal draw since 06:00.",
+      "symptom_to_check": "Supply fan running continuously at full speed or motor drawing high amps against a stalled/slipping drive \u2014 check fan motor amp draw versus nameplate, belt and bearing condition, VFD fault codes or override to full speed, and whether the unit is stuck in a continuous call with dampers or economiser jammed."
+    },
+    "ANO-2009": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.78,
+      "explanation_text": "The refrigeration compressors jumped to roughly double their normal draw and stayed there for eight hours overnight, never settling back down. Outdoor conditions were mild and cooling overnight, so the weather cannot explain the extra load, and there is no evening activity that would drive it. A sustained, elevated draw like this usually means the compressors are running almost continuously to hold temperature, which points to a developing mechanical problem rather than normal operation.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to the compressor bank tonight to check run-time and cycling on each compressor, starting with head pressure and suction pressure readings at the lead unit.",
+      "symptom_to_check": "Compressors short-cycling or running continuously without satisfying setpoint; check suction and discharge pressures, superheat and subcooling, condenser approach temperature, and compressor amp draw against nameplate for signs of a failing valve plate or inefficient compressor."
+    },
+    "ANO-2010": {
+      "top_level_class": "operational_variation",
+      "classification_type_id": "CT-010",
+      "confidence_score": 0.76,
+      "explanation_text": "The elevated reading sits in the middle of a warm, humid evening where cooling load was already running high and then tapered off gradually as the outside air cooled. The flagged hour is actually lower than the hours just before it, so nothing stepped up or stayed stuck \u2014 the unit was simply working to hold temperature overnight. This is the cooling system responding to the weather as designed, not a mechanical problem.",
+      "recommended_action": "dismiss",
+      "next_action": "Log this as expected overnight weather-driven cooling load on HVAC Unit 1 for the warm night of 17 July so the same hour is not re-flagged, and consider raising the overnight baseline for hours above roughly 75F.",
+      "symptom_to_check": ""
+    },
+    "ANO-2011": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.72,
+      "explanation_text": "The unit jumped to roughly double its normal overnight draw and then stayed there for five straight hours instead of settling back down. This happened in the middle of the night while it was getting cooler outside, so there is no cooling demand or staffing reason for the extra load. A sustained overnight plateau like this points to the unit running hard against a mechanical problem rather than responding to conditions in the building.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to HVAC Unit 3 this morning and have them start at the supply fan assembly and motor, checking whether the unit has been running continuously overnight without cycling off.",
+      "symptom_to_check": "Supply fan running continuously with no cycling: check for failed or seizing fan motor, slipping or broken belt, bearing drag, and abnormal motor amp draw against nameplate; also confirm the fan is not fighting high static from a loaded filter bank or stuck damper."
+    },
+    "ANO-2012": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-012",
+      "confidence_score": 0.93,
+      "explanation_text": "The hour before the spike recorded almost no consumption at all, and the following hour recorded roughly the missing amount on top of normal usage. That pattern is the meter losing its reading and then catching up, not the lighting circuit actually drawing extra power. Consumption either side of the gap is entirely normal.",
+      "recommended_action": "dismiss",
+      "next_action": "Log this as a meter dropout and catch-up on Lighting Grid South for 07:00-08:00 on 13 March so it is excluded from next month's exception review, and flag the meter for a routine comms/logging check at its next scheduled service.",
+      "symptom_to_check": ""
+    },
+    "ANO-2013": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.76,
+      "explanation_text": "The reading jumped to six times the normal overnight level for a single hour and then returned exactly to the previous level, with no build-up before and no elevated draw afterwards. Overnight in cold weather this unit is running at a low, steady load, so a jump of that size is far beyond what it could physically draw. This is the pattern of a bad meter reading rather than any change in how the equipment was running.",
+      "recommended_action": "dismiss",
+      "next_action": "Log this 02:00 reading on HVAC Unit 1 as a single-hour metering artefact so it is not re-opened in next month's review, and flag the meter for a routine data-quality check on its next scheduled read.",
+      "symptom_to_check": "</\u3058\u0924ranshece\u011fiz \u2014 correction below.}<br>{"
+    }
+  },
+  {
+    "ANO-2000": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.78,
+      "explanation_text": "Refrigeration load jumped to roughly three times normal in the early hours and stayed there for three hours before dropping back, at a time when the site is quiet and the outside air was cool. A sustained elevated draw with no business activity or heat load to explain it points to the cooling equipment running continuously because it cannot hold temperature. The magnitude is well within what the plant can physically draw, so this is a genuine mechanical problem rather than a meter error.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone A to inspect the lead compressor and its controls, starting with suction/discharge pressures and whether the unit is short-cycling or running without cutting out.",
+      "symptom_to_check": "Compressor running continuously without satisfying setpoint - check suction and discharge pressures, superheat, discharge temperature, contactor/starter condition, and whether the head pressure or a failed unloader is keeping the unit loaded; also verify condenser airflow and zone temperature log for the 04:00-07:00 window."
+    },
+    "ANO-2001": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.72,
+      "explanation_text": "Power draw on this refrigeration zone climbed steadily for four hours and never settled back, and it kept rising even as the outdoor temperature dropped \u2014 so the extra energy is not being driven by the weather or by the afternoon workload. That pattern is typical of a cooling system slowly losing its ability to hold temperature and running harder and harder to compensate. Left alone it will keep drawing more power and eventually put stored product at risk.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Zone B today to check refrigerant charge and superheat/subcooling on the circuit, and verify suction pressures against setpoint before the load climbs overnight.",
+      "symptom_to_check": "Progressive loss of refrigerating capacity: low suction pressure with high superheat, extended or continuous compressor run time, iced or starved evaporator coil, and possible oil traces at joints, service valves or coil returns indicating a slow refrigerant leak."
+    },
+    "ANO-2002": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.62,
+      "explanation_text": "The unit jumped to nearly three times its normal night-time draw, fell back, then did it again two hours later while the building was cold and unoccupied. A repeating high-draw cycle that is not explained by weather or staffing points to a mechanical problem in the air-handling side forcing the unit to work far harder than it should. The size of the jump is well within what this unit can physically draw, so this is a real load, not a meter error.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 2's supply fan and motor drive, starting with the fan motor current draw and belt/bearing condition during a night cycle.",
+      "symptom_to_check": "Supply fan motor drawing well above nameplate FLA on short repeating cycles overnight \u2014 check for seized or dragging bearings, slipping or shredded belt, fan running against a closed or stuck damper, and VFD faulting or hunting to full speed."
+    },
+    "ANO-2003": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.82,
+      "explanation_text": "The unit jumped to nearly four times its normal overnight draw and stayed there for four straight hours with no sign of settling back down. Outdoor conditions were mild and unchanging, so there is no cooling demand to explain it, and the flat sustained level rules out a meter glitch. This points to a component on the air handling side running hard and continuously \u2014 most likely a fan or its drive stuck at full output.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to inspect HVAC Unit 1's supply fan and variable speed drive, starting with whether the fan is locked at full speed overnight instead of following the setback schedule.",
+      "symptom_to_check": "Supply fan running at full speed continuously with no setback; check VFD for override/manual mode, fan motor amp draw against nameplate, belt and bearing condition, and whether the fan is fighting a closed damper or high static"
+    },
+    "ANO-2004": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.62,
+      "explanation_text": "The south lighting circuit drew several times its normal load for a single hour on a weekend morning, then dropped straight back to normal with no build-up or after-effect. That pattern fits a lighting control or timer override switching banks on in full when they should be at weekend levels, rather than a weather or activity driven change. It is well above what the circuit normally carries but still within what the fixtures on that grid could physically draw, so it should be treated as a real control problem rather than a meter error.",
+      "recommended_action": "monitor",
+      "next_action": "Watch Lighting Grid South over the next 24 hours for a repeat single-hour jump of roughly 4-5x baseline (about 90 kWh) near the 10:00 hour, especially at the weekend; if it recurs, pull the lighting control schedule and override log for that circuit and raise a controls work order.",
+      "symptom_to_check": ""
+    },
+    "ANO-2005": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-002",
+      "confidence_score": 0.66,
+      "explanation_text": "Refrigeration power on this zone climbed steadily over three hours on a cool Sunday evening, when there is no throughput or warm weather to explain extra cooling demand. A slow, escalating rise in cooling energy of this kind usually means the system is losing cooling capacity and having to run harder and longer to hold temperature, which points to a loss of refrigerant charge. The load is within what the zone can physically draw, so this is a real plant issue rather than a metering error and should be inspected before product temperature is affected.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to Refrigeration Zone A to check system charge and run times, starting with suction/discharge pressures and superheat on the zone's circuit.",
+      "symptom_to_check": "Progressively extended compressor run times with low suction pressure and high superheat, iced or starved evaporator coil, and oily residue at joints, valve stems or coil returns indicating a refrigerant leak."
+    },
+    "ANO-2006": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.66,
+      "explanation_text": "The lighting circuit reported a single hour of load eight times its normal draw, then returned instantly to its usual level. A lighting grid has a fixed number of fixtures and physically cannot draw that much power, so the reading is almost certainly a false value produced by the meter rather than real consumption. No technician visit is warranted for the spike itself.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the Thursday 20:00 Lighting Grid North reading as a spurious meter value and exclude it from the monthly energy report; separately note the modest step up in lighting load at 22:00-23:00 and confirm it matches the evening cleaning or dock lighting schedule so it is not re-flagged.",
+      "symptom_to_check": ""
+    },
+    "ANO-2007": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-005",
+      "confidence_score": 0.72,
+      "explanation_text": "The southern lighting circuit drew roughly three times its normal night-time load for a single hour, then dropped straight back to its usual level. That size of jump is well within what the lighting circuit can physically draw, so it is not a metering error, and there is no night activity or weather reason for lights to work harder. The most likely cause is a lighting control or scheduling fault that briefly switched banks on that should have stayed off or dimmed.",
+      "recommended_action": "monitor",
+      "next_action": "Watch the Lighting Grid South meter over the next 24 hours, specifically the 22:00-00:00 window; if it again reaches roughly 85-95 kWh/hr against a ~27 kWh baseline, raise a work order for the lighting control panel and pull the timeclock/occupancy schedule logs for that night.",
+      "symptom_to_check": ""
+    },
+    "ANO-2008": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.79,
+      "explanation_text": "The unit jumped to nearly four times its normal draw within a single hour and then held there steadily for four hours without easing back. Outdoor conditions were mild, so there is no cooling demand that would explain the extra load, and the flat sustained pattern is typical of a unit fighting an air-moving problem rather than responding to the building. This looks like a genuine mechanical fault that will keep burning energy until someone opens the unit.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to HVAC Unit 2 this morning and have them inspect the supply fan assembly and drive first, then the filter bank and airflow path.",
+      "symptom_to_check": "Supply fan running continuously at full speed with low or no airflow across the coil \u2014 check for a slipping or broken belt, seized or failed bearings, motor drawing locked-rotor current, blade damage or imbalance, and confirm static pressure across the filter bank and coil to rule out a blocked air path."
+    },
+    "ANO-2009": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-001",
+      "confidence_score": 0.78,
+      "explanation_text": "The refrigeration compressors jumped to roughly double their normal night-time draw and stayed there for eight straight hours without settling back down. Outdoor conditions were mild and falling overnight, so weather and evening activity cannot explain it. A plateau like this points to compressors running almost continuously because they can no longer hold the set temperature.",
+      "recommended_action": "dispatch",
+      "next_action": "Send a refrigeration technician to the compressor bank tonight to check head pressure, suction pressure and run-time cycling on each compressor before the elevated draw continues into tomorrow.",
+      "symptom_to_check": "Compressors short-cycling or running continuously without satisfying setpoint; check discharge/suction pressures, superheat and subcooling, condenser approach temperature, and whether one compressor is failing to unload or has a leaking valve plate."
+    },
+    "ANO-2010": {
+      "top_level_class": "operational_variation",
+      "classification_type_id": "CT-010",
+      "confidence_score": 0.66,
+      "explanation_text": "The air conditioning was running heavier than usual across the whole warm evening, not just in the flagged hour, and the load eases steadily as the outdoor temperature drops overnight. That tracking with the weather is how cooling equipment is supposed to behave on a warm night. There is no sudden step up or flat plateau that would suggest a mechanical problem.",
+      "recommended_action": "dismiss",
+      "next_action": "Log this as expected warm-night cooling load on HVAC Unit 1 for the 17 July overnight period so the elevated 21:00-02:00 hours are not re-flagged; consider raising the overnight baseline for temperatures above 75F.",
+      "symptom_to_check": ""
+    },
+    "ANO-2011": {
+      "top_level_class": "equipment_fault",
+      "classification_type_id": "CT-003",
+      "confidence_score": 0.78,
+      "explanation_text": "The unit's power draw jumped sharply just after midnight and then stayed high for five straight hours instead of easing back, even though it was getting cooler outside and the site was closed. Load that climbs and holds while cooling demand is falling points to the air-moving side of the unit struggling and the system running continuously to compensate. This is a mechanical problem rather than normal night-time behaviour, and it will keep burning energy until someone looks at it.",
+      "recommended_action": "dispatch",
+      "next_action": "Send an HVAC technician to Unit 3 to inspect the supply fan assembly, motor and drive belt, and confirm whether the unit is stuck running continuously overnight.",
+      "symptom_to_check": "Supply fan not achieving rated airflow \u2014 check for slipping or broken belt, seized or bearing-worn fan motor, high motor amp draw against nameplate, low static pressure across the coil, and whether the unit is short-cycling or locked in continuous run with no thermostat call."
+    },
+    "ANO-2012": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-012",
+      "confidence_score": 0.91,
+      "explanation_text": "The hour before the spike recorded almost no usage at all, and the following hour recorded roughly the missing amount plus the normal load. That pattern is the meter failing to report for one hour and then dumping the accumulated total into the next reading, and consumption returns to normal immediately afterwards. The lighting circuit itself shows no sign of abnormal operation.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 07:00-08:00 reading on Lighting Grid South as a meter dropout with catch-up reporting so it is excluded from next month's exception review, and ask metering to check the logger's data link for that channel.",
+      "symptom_to_check": ""
+    },
+    "ANO-2013": {
+      "top_level_class": "data_anomaly",
+      "classification_type_id": "CT-013",
+      "confidence_score": 0.79,
+      "explanation_text": "The reading jumps to roughly six times the normal overnight draw for a single hour and then returns exactly to where it was, with no build-up before and no elevated load after. A heating and ventilation unit running on a quiet, cold night cannot physically pull that much power in one hour and then behave perfectly again, and there was no dip beforehand that would suggest the meter was catching up on a missed reading. This is almost certainly a bad reading from the meter rather than a real change in the equipment.",
+      "recommended_action": "dismiss",
+      "next_action": "Log the 02:00 Tuesday HVAC Unit 1 reading as a single-interval meter spike artefact so it is excluded from next month's exception review, and flag the meter for inclusion in the next scheduled instrument check if further isolated single-hour outliers appear.",
+      "symptom_to_check": ""
+    }
+  }
+]

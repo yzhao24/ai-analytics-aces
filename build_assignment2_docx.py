@@ -278,23 +278,24 @@ para(doc, [("Validated at the classification level on synthetic data only; real-
             {})])
 
 head(doc, "A good output and a bad one", 2)
-table(doc, ["", "Good — ANO-2012", "Bad — ANO-2009"], [
+table(doc, ["", "Good — ANO-2010", "Bad — ANO-2009"], [
     ["Did",
-     "Lighting circuit at 3.75× baseline, the largest reading in the dataset → Meter Dropout, "
-     "0.88, dismiss. Correct.",
-     "Eight-hour refrigeration load at 1.15× → Compressor Fault, 0.78, dispatch. It was a Peak "
-     "Throughput Day."],
+     "Midnight HVAC flagged at 21.4 kWh above baseline → Weather-Driven HVAC Surge, "
+     "0.72, dismiss. Correct.",
+     "Eight hours at 2.1× on a compressor bank → Compressor Fault, 0.78, dispatch. It "
+     "was a Peak Throughput Day."],
     ["Why",
-     "Read the hour before, which recorded almost nothing — impossible for a circuit that was "
-     "on — and recognised the missing usage bundled into the next read. Named the mechanism, "
-     "not the magnitude.",
-     "The reasoning is sound and the evidence is absent. A sustained overnight load that does not "
-     "ease as it cools does look like a compressor fault when shift schedules are not an input."],
+     "The agent rebuilt the baseline from hours at the same temperature and scored the "
+     "spike z = −0.04. At 76°F it sits inside normal consumption — the alert came from "
+     "a baseline blind to weather. The only case where the agent overturns the detector.",
+     "The reasoning is sound and the evidence is absent. A sustained overnight load that "
+     "does not ease as it cools does look like a compressor fault when shift schedules "
+     "are not an input."],
     ["Effect",
-     "“Log this as a known meter dropout… and ask metering to check the logger's communications "
-     "reliability.” No technician sent on the scariest number in the set.",
-     "Sends a technician overnight to a healthy compressor bank. Confidently wrong is worse than "
-     "uncertain: at 0.78 it clears the commit gate."],
+     "“Log this as expected warm-night cooling load… so the same midnight hour is not "
+     "re-flagged.” No technician sent on an alarm the manager's own system raised.",
+     "Sends a technician overnight to a healthy compressor bank. Confidently wrong is "
+     "worse than uncertain: at 0.78 it clears the commit gate."],
 ], [0.45, 3.4, 3.35])
 
 # ───────────────────────────── PART B ────────────────────────────────────────

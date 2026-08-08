@@ -78,23 +78,25 @@ Claude turns that into one of fourteen causes, locked to a schema. Seven fields
 come back, every one actionable. Let me show you.""",
 
 5: """[THE DEMO — play the recording. These are the beats it contains, so you can
-introduce it and pick it up cleanly at the end. Full script in DEMO_SCRIPT.md.]
+introduce it and pick it up cleanly. Full script in DEMO_SCRIPT.md.]
 
-Say first, out loud: "What you are about to see is a screen recording, made on
-this machine. It is not a live run." The assignment requires you to label it.
+Say first, out loud: "What you are about to see is a screen recording, made on this
+machine. It is not a live run." The assignment requires you to label it.
 
-  0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, red dots.
+  0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, 25 flagged hours.
 
-  0:45  ANO-2000 — it works. Refrigeration Zone A, 4am, 122.5 kWh against a 61.1
-        baseline, double for three hours at 48 degrees. Compressor fault, 0.78,
-        dispatch — with a symptom a refrigeration tech can act on.
+  0:40  ANO-2000 — it works. Refrigeration Zone A at 4am, 122.5 kWh above a 61.1
+        baseline, three times normal for three hours at 48 degrees, z = 29.5.
+        Compressor fault, 0.78, dispatch — with a symptom for the technician.
 
-  0:35  ANO-2012 — it saves the trip. Lighting Grid South at 3.75x normal, the
-        scariest number in the set. The hour before recorded almost nothing, so
-        the meter dropped out and caught up. Meter dropout, 0.88, dismiss.
+  0:45  ANO-2010 — the agent earns its keep. Midnight HVAC, 21.4 above baseline, and
+        the building system flags it. The agent rebuilds the baseline from hours at
+        the same temperature and scores it z = minus 0.04 — not significant. It was a
+        warm July night. This is the only case where the agent overturns the detector;
+        everything else scores above 20.
 
-  0:30  ANO-2009 — it fails. Compressor Bank, eight hours at 1.15x. Called a
-        compressor fault at 0.78; it was a peak throughput day.
+  0:30  ANO-2009 — it fails. Compressor Bank, eight hours at 2.1x, called a compressor
+        fault at 0.78. It was a peak throughput day.
 
   0:25  Guardrails. A file in watts instead of kilowatts caught on upload, and an
         exception recorded when none of the three actions fit.

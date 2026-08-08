@@ -349,17 +349,17 @@ stamp(s, 4)
 s = add()
 card(s, 0, 0, W, H, fill=BLACK)
 tb(s, L, 1.5, CW, 1.0, "DEMO — SCREEN RECORDING", size=24, bold=True, color=GOLD)
-tb(s, L, 2.6, 23.0, 2.2, "It works, it saves a trip, and it fails",
+tb(s, L, 2.6, 23.0, 2.2, "The alarm was real. The fault was not.",
    size=64, bold=True, color=WHITE)
 
 items = [
-    ("ANO-2000 — it works.", "  Refrigeration Zone A at 4am, 122.5 kWh against a 61.1 "
-     "baseline — double, for three hours, at 48°F. Compressor fault, 0.78, dispatch, "
-     "with a symptom a refrigeration tech can act on."),
-    ("ANO-2012 — it saves the trip.", "  Lighting Grid South at 3.75× normal, the "
-     "scariest number in the set. The hour before recorded almost nothing: the meter "
-     "dropped out and caught up. Dismiss at 0.88 — no technician sent."),
-    ("ANO-2009 — it fails, and we show you.", "  Eight hours at 1.15× on the Compressor "
+    ("ANO-2000 — it works.", "  Refrigeration Zone A at 4am: 122.5 kWh above a 61.1 "
+     "baseline, 3.0× normal for three hours at 48°F. z = 29.5. Compressor fault, 0.78, "
+     "dispatch — with a symptom a refrigeration tech can act on."),
+    ("ANO-2010 — the agent overturns the alarm.", "  Midnight HVAC, 21.4 kWh above "
+     "baseline, and your building system says investigate. The agent compares against "
+     "hours at the same temperature and scores it z = −0.04. It was a warm July night."),
+    ("ANO-2009 — it fails, and we show you.", "  Eight hours at 2.1× on the Compressor "
      "Bank, called a fault at 0.78. It was a Peak Throughput Day, and no prompt fixes "
      "that when shift schedules are not an input."),
     ("Then the guardrails.", "  A meter file in watts instead of kilowatts, caught on "

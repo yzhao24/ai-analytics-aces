@@ -1,41 +1,50 @@
 # Demo recording script — Energy Anomaly Explainer
 
-**Target 2:30.** Three cases in a deliberate order: it works → it saves a needless
-trip → it fails. Then the guardrails. Every number below is what the panel actually
-shows; anything you must read off the screen is marked `[read]`.
+**Target 2:35.** Three cases in a deliberate order: it works → the agent overturns
+the alarm → it fails. Then the guardrails.
+
+**Every number below was read off the live panel on 8 Aug 2026.** Where the script
+quotes a figure, that figure is on screen. Re-verify if you re-run `classifier.py`.
 
 ---
 
 ## Which cases, and why
 
-| Case | System | On screen | Why it earns its place |
+| Case | System | z-score | Why it earns its place |
 |---|---|---|---|
-| **ANO-2000** | Refrigeration Zone A | 122.5 vs 61.1 kWh, **2.01×**, 3 h, 48 °F | The happy path. Big unambiguous spike, correct diagnosis, and a dispatch carrying a symptom a refrigeration tech can act on. |
-| **ANO-2012** | Lighting Grid South | 101.4 vs 27.0 kWh, **3.75×**, 1 h | The most alarming number in the deck, and the right answer is *don't send anyone*. Highest confidence in the whole set (0.88). |
-| **ANO-2009** | Compressor Bank | 98.0 vs 85.3 kWh, **1.15×**, 8 h | The failure. Called a Compressor Fault at 0.78; it was a Peak Throughput Day. Shows the limit honestly. |
+| **ANO-2000** | Refrigeration Zone A, Milwaukee Central | **29.50** | The happy path. Big unambiguous spike, correct fault, dispatch with a symptom a refrigeration tech can act on. |
+| **ANO-2010** | HVAC Unit 1, Chicago South DC | **−0.04** | **The one that proves the agent is doing work.** The only case where the weather-matched baseline overturns the detector. Everything else scores z ≥ 20. |
+| **ANO-2009** | Compressor Bank, Indianapolis East | **20.82** | The failure. Compressor Fault at 0.78; it was a Peak Throughput Day. |
 
-### Do not use ANO-2010
+**Reading the panel correctly.** "Spike above baseline: 122.5 kWh" is the *excess*,
+not the total. Baseline 61.1 + excess 122.5 = a 183.6 kWh peak, which is why the
+agent line reads **3.0× baseline**. Quote the two numbers and the multiple exactly as
+the panel gives them and you cannot go wrong.
 
-The old script opened on it. Its "spike" is **21.4 kWh against a 38.4 baseline —
-0.56×, seventeen kWh *below* normal**. The screen contradicts the word "spike," and
-the first question from the room is one you cannot answer cleanly on camera.
-ANO-2012 delivers the same beat — a scary number correctly dismissed — with numbers
-that support the story.
+*Optional fourth if you want a "saves the trip" beat:* **ANO-2012** — Lighting Grid
+South, 101.4 above a 27.0 baseline, **4.8× baseline, z = 43.35**, correctly dismissed
+as Meter Dropout at 88%. Highest confidence in the whole set.
 
 ---
 
 ## Before you hit record
 
-- `python3 run_dashboard.py`, then **load the dashboard once** and let it cache.
-  First parse of 78,840 rows takes several seconds and you do not want it on tape.
-- Build the broken export (one-liner in the README) and leave `sample_bad_export.csv`
-  on the desktop.
-- Do Not Disturb on. Close Slack, Mail, everything with a badge.
+- The dashboard is already running on **http://localhost:8520** and the data is
+  cached. **Do not restart it** — first load costs ~35 s while it parses 78,840 rows.
+- Build the broken export and leave it on the desktop:
+  ```bash
+  cd /Users/yunzhao/Downloads/AI/energy-anomaly-explainer && python3 -c "
+  import pandas as pd
+  r = pd.ExcelFile('dummy_data_set2.xlsx').parse('energy_readings').tail(300).copy()
+  r['kwh'] *= 1000
+  r.loc[r.index[:6], 'system_id'] = 'SYS-999'
+  r.to_csv('sample_bad_export.csv', index=False)"
+  ```
+- Do Not Disturb on. Close anything with a badge.
 - Browser at 1920×1080, zoom 100%, bookmarks bar hidden.
-- Move the mouse slowly and deliberately. Pause ~1 s after each click before you
-  speak — it reads as confident, and it gives you clean cut points.
-- Record 3 short takes, one per case, rather than one long take. Far easier to redo
-  a 40-second segment than a 2:30 run.
+- **Record four short takes**, one per section. Redoing 40 seconds beats redoing 2:35.
+- Pause ~1 s after each click before speaking. It reads as confident and gives you
+  clean cut points.
 
 ---
 
@@ -43,75 +52,82 @@ that support the story.
 
 > **Dashboard screen.**
 
-"This is twelve months of hourly electricity data from three distribution centers —
-about seventy-nine thousand readings across nine sub-systems. Every red dot is an
-hour our detector flagged as unusual. The question for the operations manager is
-always the same one: which of these is worth a technician?"
+"Twelve months of hourly electricity data from three distribution centers — about
+seventy-nine thousand readings across nine sub-systems. Every red dot is an hour our
+detector flagged. Twenty-five of them. The manager's question is always the same:
+which of these is worth a technician?"
 
 ---
 
-## 2 · It works — ANO-2000 — 0:45
+## 2 · It works — ANO-2000 — 0:40
 
-> **Open ANO-2000** (Refrigeration Zone A, FAC-003, Friday 17 April, 04:00).
+> **Anomaly table → row dated 2026-04-17 04:00, Milwaukee Central → View.**
 
-"Refrigeration Zone A, four in the morning. Draw is a hundred and twenty-two
-kilowatt-hours against a baseline of sixty-one — **double**, held for three hours."
+"Refrigeration Zone A, four in the morning. A hundred and twenty-two kilowatt-hours
+**above** a baseline of sixty-one — three times normal, held for three hours."
 
-"It's forty-eight degrees outside. Nobody's in the building, and the weather can't
-explain a cooling system running flat out at four a.m."
+"It's forty-eight degrees outside. Nobody's in the building, and the weather cannot
+explain a cooling system running flat out at four a.m. — the panel says exactly that."
 
-> **Expand "See steps."** Scroll the four tools.
+> **Point at the agent line.**
 
-"Behind that sit four tools running over the real data — it pulls the window around
-the spike, builds a baseline from hours at a *similar temperature*, runs a
-significance test `[read the z-score aloud]`, and looks for comparable past events."
+"The agent scores it z equals twenty-nine point five. That is not a marginal call."
 
-> **Point at the classification, then the symptom line.**
+> **Scroll to the symptom.**
 
-"It calls this a compressor fault at seventy-eight percent confidence, and
-recommends dispatch. The part I'd point at is the last field — the symptom:
-*compressor running continuously without cycling off, high discharge and low suction
-pressure, elevated superheat.* That's not a summary for a manager. That's what you
-say to the refrigeration tech when you call them."
+"Compressor fault, seventy-eight percent, dispatch. And the field I'd point at is the
+last one — the symptom: *running continuously without cycling off, high discharge and
+low suction pressure, elevated superheat.* That isn't a summary for a manager. That's
+what you say to the refrigeration tech when you call them."
 
 ---
 
-## 3 · It saves the trip — ANO-2012 — 0:35
+## 3 · The agent earns its keep — ANO-2010 — 0:45
 
-> **Back, open ANO-2012** (Lighting Grid South, FAC-003, Friday 13 March, 08:00).
+> **Back → row dated 2026-07-17 00:00, Chicago South DC → View.**
 
-"Here's the biggest number in the dataset. Lighting Grid South, a hundred and one
-kilowatt-hours against a baseline of twenty-seven — **three and three-quarter times
-normal**. If you're the manager, this is the one that scares you."
+"Now the case that shows why there's an agent here at all."
 
-> **Read the explanation on screen.**
+"Midnight, HVAC Unit 1. Twenty-one kilowatt-hours above baseline — one-point-six times
+normal. Your building management system flagged this, and it would tell you to look
+into it."
 
-"The system says don't send anyone. The reason is in the hour *before*: it recorded
-almost no electricity at all, which is impossible for a lighting circuit that was
-on. The missing usage got bundled into the next reading. This is the meter failing
-and catching up — not the lights."
+> **Point at the agent decision block.**
 
-"Meter dropout, eighty-eight percent — the highest confidence it gives anything in
-our test set. Action: dismiss. That's a three-hundred-dollar technician visit it
-just didn't spend."
+"The agent disagrees. **Z-score minus zero point zero four.** Fifty-first percentile.
+Not significant."
+
+> **Read the line on screen.**
+
+"And here's why: *at seventy-six degrees this sits within normal consumption for
+comparable hours — the alert came from a baseline that does not account for
+temperature.* It was a warm night in July. The detector didn't know that. The agent
+built its comparison from other hours at the same temperature, and the spike
+disappeared."
+
+> **Point at the tool count.**
+
+"Note it ran three tools, not four — once the spike isn't significant it stops looking
+for comparable events. And the recommendation is log it and monitor, not dispatch."
+
+"**The alarm was real. The fault was not. That gap is the whole product.**"
 
 ---
 
 ## 4 · It fails — ANO-2009 — 0:30
 
-> **Open ANO-2009** (Compressor Bank, FAC-002, Monday 27 July, 20:00).
+> **Back → top row, 2026-07-27 20:00, Indianapolis East → View.**
 
-"And now one it gets wrong, because you should see this too."
+"And one it gets wrong, because you should see this too."
 
-"Compressor Bank, eight in the evening. Ninety-eight kilowatt-hours against
-eighty-five — only fifteen percent above baseline, but it holds there for **eight
-hours** while the outside air cools off."
+"Compressor Bank, eight in the evening. Ninety-eight above a baseline of eighty-five —
+two-point-one times normal, but held for **eight hours** while the outside air cooled."
 
-"It calls that a compressor fault at seventy-eight percent and sends a technician.
-It was a **peak throughput day** — the warehouse was simply busy."
+"Compressor fault, seventy-eight percent, dispatch a technician. It was a **peak
+throughput day**. The warehouse was busy."
 
-"And this is not a prompt we can fix. Shift schedules aren't an input this product
-receives. On kilowatt-hours alone, a busy shift and a stuck compressor look the
+"This is not a prompt we can fix. Shift schedules aren't an input this product
+receives, so on kilowatt-hours alone a busy shift and a stuck compressor look the
 same. We say so in the presentation."
 
 ---
@@ -120,30 +136,67 @@ same. We say so in the presentation."
 
 > **Settings → Import Meter Data → upload `sample_bad_export.csv`.**
 
-"Two things protect the numbers you just saw. First, every import is checked against
-the existing database. This file is in watts instead of kilowatts and carries a
-sub-system code that doesn't exist `[read the findings]`. Without that check you get
-a perfectly plausible dashboard where every classification behind it is meaningless
-— and it shows up in no accuracy metric, because the labels still match."
+"Two things protect the numbers you just saw. Every import is checked against the
+existing database — this file is in watts instead of kilowatts and carries a
+sub-system code that doesn't exist. Without that check you get a perfectly plausible
+dashboard where every classification behind it is meaningless, and it shows up in no
+accuracy metric, because the labels still match."
 
-> **Back to any case → expand "None of these fit."** Type a short reason, record it.
+> **Back to any case → expand "None of these fit — record an exception."** Type a
+> short reason and record it.
 
-"Second — three actions can't cover everything. When none of them fit, the manager
-records an exception in their own words instead of picking the closest wrong one.
-Those notes are the best evidence we get about what our fourteen-cause taxonomy is
-missing."
+"And three actions can't cover everything. When none fit, the manager writes down what
+should happen instead. Those notes are the best evidence we get about what our
+fourteen-cause taxonomy is missing."
 
 ---
 
 ## Closing line (optional, 0:05)
 
-"That's the product. The next three slides are how we tested it, and what it can't do."
+"That's the product. The next slides are how we tested it, and what it can't do."
 
 ---
 
-## If a number on screen differs from this script
+## Two things to expect on camera
 
-Read what's on the screen, not what's written here. The classifications are
-regenerated by `classifier.py`, and confidence can move by ~0.04 between runs —
-class, subtype and action have been stable across three runs, but the decimals move.
+**ANO-2010 carries a ⚠ REVIEW RECOMMENDED badge.** That is not an error — it appears
+because confidence is 0.72, below the 0.75 gate. If anyone asks, it is the exact
+mechanism Nathanael describes on slide 8: the gate is set five times higher than
+break-even, so it flags correct answers for review.
+
+**If a number differs from this script, read the screen, not the page.** Class,
+subtype and action have been stable across three runs; confidence moves by about 0.04.
 Re-record the segment rather than talking over a mismatch.
+
+---
+
+## Reference — exactly what each panel showed (read 8 Aug 2026)
+
+Check the screen against this while recording. If a line differs, the classifier has
+been re-run; re-verify before you narrate it.
+
+| | **ANO-2000** | **ANO-2010** | **ANO-2009** |
+|---|---|---|---|
+| Timestamp | 2026-04-17 04:00 | 2026-07-17 00:00 | 2026-07-27 20:00 |
+| Facility | Milwaukee Central | Chicago South DC | Indianapolis East |
+| System | Refrigeration Zone A | HVAC Unit 1 | Compressor Bank |
+| Spike above baseline | 122.5 kWh | 21.4 kWh | 98.0 kWh |
+| Baseline | 61.1 kWh | 38.4 kWh | 85.3 kWh |
+| Duration | 180 min | 60 min | 480 min |
+| Temperature | 48.0 °F | 76.4 °F | 74.1 °F |
+| Class | Equipment Fault | Operational Variation | Equipment Fault |
+| Subtype | Compressor Fault | Weather-Driven HVAC Surge | Compressor Fault |
+| Confidence | Medium (78%) | Medium (72%) | Medium (78%) |
+| **z-score** | **29.50** | **−0.04** | **20.82** |
+| p-value | 3.706e-191 | 0.9677 | 3.369e-96 |
+| Multiple | 3.0× baseline | 1.6× baseline | 2.1× baseline |
+| Percentile | 100.00th | 51.61th | 100.00th |
+| Agent decision | DISPATCH RECOMMENDED | NOT SIGNIFICANT · LIKELY NOISE | DISPATCH RECOMMENDED |
+| Tools run | 4 in 3.2 s | **3 in 2.4 s** | 4 in 3.2 s |
+| Button | Dispatch Technician | Log as Operational — Monitor 24hr | Dispatch Technician |
+| Badge | — | ⚠ REVIEW RECOMMENDED | — |
+| Ground truth | Compressor Fault ✓ | Weather-Driven HVAC Surge ✓ | **Peak Throughput Day ✗** |
+
+Optional fourth — **ANO-2012**, 2026-03-13 08:00, Milwaukee Central, Lighting Grid
+South: 101.4 above a 27.0 baseline, 37.7 °F, Meter Dropout, High (88%), **z = 43.35**,
+4.8× baseline, DISMISS RECOMMENDED, button "Dismiss — Meter/Sensor Error".

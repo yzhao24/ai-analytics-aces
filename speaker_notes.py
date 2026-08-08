@@ -77,37 +77,29 @@ comparable past events.
 Claude turns that into one of fourteen causes, locked to a schema. Seven fields
 come back, every one actionable. Let me show you.""",
 
-5: """[THE DEMO — run it live. Stage directions, not a script. Two minutes.]
+5: """[THE DEMO — play the recording. These are the beats it contains, so you can
+introduce it and pick it up cleanly at the end. Full script in DEMO_SCRIPT.md.]
 
-BEFORE CLASS: launch the dashboard, load the workbook once so it's cached, have
-sample_bad_export.csv on the desktop. If the network is down, say out loud "this
-is a recording" and play it.
+Say first: "This is a recording, made on this machine."
 
-1. Dashboard. Twelve months hourly, three facilities, nine sub-systems. Red dots
-   are flagged spikes.
+  0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, red dots.
 
-2. Open ANO-2010. "Midnight, HVAC Unit 1, flagged at twenty-one point four
-   kilowatt-hours above baseline. If you're the manager, your building system
-   just told you something is wrong."
+  0:45  ANO-2000 — it works. Refrigeration Zone A, 4am, 122.5 kWh against a 61.1
+        baseline, double for three hours at 48 degrees. Compressor fault, 0.78,
+        dispatch — with a symptom a refrigeration tech can act on.
 
-3. Open "See steps" and land on the baseline: "it was seventy-six degrees at
-   midnight. Compare this hour against other hours at that temperature and it
-   scores z = minus zero point zero four. That's not an anomaly — that's a warm
-   night."
+  0:35  ANO-2012 — it saves the trip. Lighting Grid South at 3.75x normal, the
+        scariest number in the set. The hour before recorded almost nothing, so
+        the meter dropped out and caught up. Meter dropout, 0.88, dismiss.
 
-4. Read the explanation aloud, then the line that matters:
-   "The alarm was real. The fault was not. That gap is the whole product."
+  0:30  ANO-2009 — it fails. Compressor Bank, eight hours at 1.15x. Called a
+        compressor fault at 0.78; it was a peak throughput day.
 
-5. Settings → upload sample_bad_export.csv. The guard catches watts-instead-of-
-   kilowatts and an unregistered sub-system. "This failure shows up in no
-   accuracy metric — every label is still correct and every number behind it is
-   meaningless."
+  0:25  Guardrails. A file in watts instead of kilowatts caught on upload, and an
+        exception recorded when none of the three actions fit.
 
-6. Open "None of these fit" and record an exception. "When the three actions
-   don't cover it, we capture that instead of forcing a wrong pick."
-
-HAND OFF: "That's the product working. Cindy will tell you how we decided
-whether it works well."\
+HAND OFF: "That's the product working, and one case it gets wrong. Cindy will tell
+you how we decided whether it works well."\
 """,
 
 6: """This is the slide audiences skip, and it's where most AI projects fail —

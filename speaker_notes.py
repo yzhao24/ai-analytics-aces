@@ -61,49 +61,23 @@ So we fixed a bar in advance: precision at least seventy-five percent, recall at
 least seventy, against held-out labels. Everything after this reports against
 that bar.""",
 
-4: """Here's the whole product.
+4: """Here's the whole product in one line.
 
-Hourly kilowatt-hours come in — the file the manager already has. We pair it
-with real hourly temperature from a free weather API, so nobody installs a
-sensor.
+Two things go in. The hourly meter file the manager already has — and real
+temperature, pulled from a free weather API. Nobody installs a sensor.
 
-A detector flags spikes, and it's deliberately weather-blind: it stands in for
-the threshold alarm the manager already gets.
+Then two baselines. The detector's is deliberately weather-blind — it stands in
+for the threshold alarm the manager already gets today. The agent's is
+weather-matched: it rebuilds the comparison from hours at the same temperature,
+then runs a significance test on the difference.
 
-Then an agent runs four real tools — pulls the window around the spike, builds a
-baseline from hours at a similar temperature, runs a significance test, finds
-comparable past events.
+And one record out. Claude names one of fourteen causes, and seven fields come
+back — the explanation, the next step, and the symptom for the technician.
+Dispatch, monitor, or dismiss.
 
-Claude turns that into one of fourteen causes, locked to a schema. Seven fields
-come back, every one actionable. Let me show you.""",
+The gap between those two baselines is the entire product. Let me show you.""",
 
-5: """[THE DEMO — play the recording. These are the beats it contains, so you can
-introduce it and pick it up cleanly. Full script in DEMO_SCRIPT.md.]
-
-Say first, out loud: "What you are about to see is a screen recording, made on this
-machine. It is not a live run." The assignment requires you to label it.
-
-  0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, 25 flagged hours.
-
-  0:40  ANO-2000 — it works. Refrigeration Zone A at 4am, 122.5 kWh above a 61.1
-        baseline, three times normal for three hours at 48 degrees, z = 29.5.
-        Compressor fault, 0.78, dispatch — with a symptom for the technician.
-
-  0:45  ANO-2010 — the agent earns its keep. Midnight HVAC, 21.4 above baseline, and
-        the building system flags it. The agent rebuilds the baseline from hours at
-        the same temperature and scores it z = minus 0.04 — not significant. It was a
-        warm July night. This is the only case where the agent overturns the detector;
-        everything else scores above 20.
-
-  0:30  ANO-2009 — it fails. Compressor Bank, eight hours at 2.1x, called a compressor
-        fault at 0.78. It was a peak throughput day.
-
-  0:25  Guardrails. A file in watts instead of kilowatts caught on upload, and an
-        exception recorded when none of the three actions fit.
-
-HAND OFF: "That's the product working, and one case it gets wrong. Cindy will tell
-you how we decided whether it works well."\
-""",
+5: "",
 
 6: """This is the slide audiences skip, and it's where most AI projects fail —
 the output is fluent, nobody defined "good," and the audience finds the error.
@@ -222,6 +196,72 @@ def timing():
     return {n: (who, DEMO_SECONDS if n == 5
                 else max(10, round(len(SCRIPT[n].split()) / WPM * 60)))
             for n, who in SPEAKERS.items()}
+
+
+def notes_for(n):
+    """What goes in the slide's notes pane: how to deliver it, then what to say."""
+    parts = []
+    if COACHING.get(n):
+        parts.append(COACHING[n].strip())
+    if SCRIPT.get(n, "").strip():
+        parts.append("─" * 74)
+        parts.append(SCRIPT[n].strip())
+    return "\n\n".join(parts)
+
+
+# How to deliver it. Never counted toward the time budget — SCRIPT is the clock.
+COACHING = {
+
+4: """THE SPINE — memorise these four lines and you cannot get lost:
+
+      Two things in.
+      Two baselines.
+      One record out.
+      The gap between the two baselines is the product.
+
+Walk the boxes left to right; the slide is your prompt. If you blank, say the
+spine and move on — the detail is decoration.
+
+THE TWO WORDS THAT DO THE WORK: weather-BLIND and weather-MATCHED. They are on
+the slide, they are the whole contrast, and they set up ANO-2010 in the demo,
+where the blind baseline alarms and the matched one scores z = minus 0.04.
+
+RUNNING LONG? Cut to 30 seconds:
+  "Two things go in — the meter file the manager already has, and real
+   temperature from a free API. Then two baselines: the detector's is
+   deliberately blind to weather, the agent's is matched to it. One record comes
+   out — one of fourteen causes, seven fields, dispatch, monitor or dismiss. The
+   gap between those two baselines is the entire product."
+""",
+
+5: """[THE DEMO — play the recording. These are the beats it contains, so you can
+introduce it and pick it up cleanly. Full script in DEMO_SCRIPT.md.]
+
+Say first, out loud: "What you are about to see is a screen recording, made on this
+machine. It is not a live run." The assignment requires you to label it.
+
+  0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, 25 flagged hours.
+
+  0:40  ANO-2000 — it works. Refrigeration Zone A at 4am, 122.5 kWh above a 61.1
+        baseline, three times normal for three hours at 48 degrees, z = 29.5.
+        Compressor fault, 0.78, dispatch — with a symptom for the technician.
+
+  0:45  ANO-2010 — the agent earns its keep. Midnight HVAC, 21.4 above baseline, and
+        the building system flags it. The agent rebuilds the baseline from hours at
+        the same temperature and scores it z = minus 0.04 — not significant. It was a
+        warm July night. This is the only case where the agent overturns the detector;
+        everything else scores above 20.
+
+  0:30  ANO-2009 — it fails. Compressor Bank, eight hours at 2.1x, called a compressor
+        fault at 0.78. It was a peak throughput day.
+
+  0:25  Guardrails. A file in watts instead of kilowatts caught on upload, and an
+        exception recorded when none of the three actions fit.
+
+HAND OFF: "That's the product working, and one case it gets wrong. Cindy will tell
+you how we decided whether it works well."\
+"""
+}
 
 
 def check():

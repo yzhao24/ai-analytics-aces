@@ -14,7 +14,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
-from speaker_notes import SCRIPT, TIMING, WPM
+from speaker_notes import COACHING, SCRIPT, TIMING, WPM
 
 OUT = Path(__file__).parent.parent / "Final_Presentation_Speech.docx"
 GREY = RGBColor(0x55, 0x55, 0x55)
@@ -137,6 +137,12 @@ def main():
                   (SLIDE_TITLES[i], {"b": True, "size": 12}),
                   (f"   ({sec // 60}:{sec % 60:02d})", {"c": GREY, "size": 10})],
                  before=8, after=4)
+            if COACHING.get(i):
+                for block in COACHING[i].split("\n\n"):
+                    if block.strip():
+                        para([(" ".join(block.split()) if not block.startswith("      ")
+                               else block.strip(), {"i": True, "size": 10.5, "c": GREY})],
+                             after=5, line=1.3)
             for block in SCRIPT[i].split("\n\n"):
                 if block.strip():
                     para(" ".join(block.split()), size=12, after=7, line=1.4)

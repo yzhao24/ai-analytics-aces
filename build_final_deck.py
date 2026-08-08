@@ -20,7 +20,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
-from speaker_notes import SCRIPT, TIMING
+from speaker_notes import TIMING, notes_for
 
 HERE = Path(__file__).parent
 TEMPLATE = HERE / "booth_template.pptx"
@@ -209,7 +209,7 @@ def table(slide, x, y, w, cols, rows, widths, sizes=(21, 20), head_fill=BLACK,
 
 def stamp(slide, n):
     """Speaker notes and the corner credit, both from speaker_notes.py."""
-    slide.notes_slide.notes_text_frame.text = SCRIPT[n]
+    slide.notes_slide.notes_text_frame.text = notes_for(n)
     who, secs = TIMING[n]
     tb(slide, W - R - 7.0, H - 1.05, 7.0, 0.5,
        f"{who}   ·   {secs // 60}:{secs % 60:02d}",

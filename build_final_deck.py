@@ -348,8 +348,8 @@ stamp(s, 4)
 # ═════════════════════════════════════════════════════════════════════════════
 s = add()
 card(s, 0, 0, W, H, fill=BLACK)
-tb(s, L, 1.5, CW, 1.0, "LIVE DEMO", size=24, bold=True, color=GOLD)
-tb(s, L, 2.6, 21.0, 2.2, "Watch the agent overturn a false alarm",
+tb(s, L, 1.5, CW, 1.0, "DEMO — SCREEN RECORDING", size=24, bold=True, color=GOLD)
+tb(s, L, 2.6, 23.0, 2.2, "It works, it saves a trip, and it fails",
    size=64, bold=True, color=WHITE)
 
 items = [
@@ -374,8 +374,9 @@ for head, rest in items:
     yy += 1.72
 
 tb(s, L, H - 1.6, CW, 0.6,
-   "Running live on the presentation machine · fallback recording ready if the "
-   "network fails, and we will say so", size=20, color=RGBColor(0x9A, 0x9A, 0x9A))
+   "Recorded on the presentation machine, unedited except for cuts between cases "
+   "— we are telling you it is a recording, not a live run",
+   size=20, color=RGBColor(0x9A, 0x9A, 0x9A))
 stamp(s, 5)
 
 # ═════════════════════════════════════════════════════════════════════════════

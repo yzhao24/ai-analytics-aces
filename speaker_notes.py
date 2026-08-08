@@ -80,7 +80,8 @@ come back, every one actionable. Let me show you.""",
 5: """[THE DEMO — play the recording. These are the beats it contains, so you can
 introduce it and pick it up cleanly at the end. Full script in DEMO_SCRIPT.md.]
 
-Say first: "This is a recording, made on this machine."
+Say first, out loud: "What you are about to see is a screen recording, made on
+this machine. It is not a live run." The assignment requires you to label it.
 
   0:15  Orientation. 12 months hourly, 3 facilities, 9 sub-systems, red dots.
 

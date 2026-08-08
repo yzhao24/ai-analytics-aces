@@ -35,3 +35,6 @@ usability_rater_*.csv
 
 # Presentation build input (Booth master, converted from .potx)
 booth_template.pptx
+
+# Nested clone of this same repo — not a submodule
+ai-analytics-aces/

@@ -278,19 +278,21 @@ para(doc, [("Validated at the classification level on synthetic data only; real-
             {})])
 
 head(doc, "A good output and a bad one", 2)
-table(doc, ["", "Good — ANO-2010", "Bad — ANO-2009"], [
+table(doc, ["", "Good — ANO-2012", "Bad — ANO-2009"], [
     ["Did",
-     "Midnight HVAC spike → Weather-Driven HVAC Surge, 0.72, dismiss. Correct.",
-     "Eight-hour refrigeration spike → Compressor Fault, 0.78, dispatch. It was a Peak "
+     "Lighting circuit at 3.75× baseline, the largest reading in the dataset → Meter Dropout, "
+     "0.88, dismiss. Correct.",
+     "Eight-hour refrigeration load at 1.15× → Compressor Fault, 0.78, dispatch. It was a Peak "
      "Throughput Day."],
     ["Why",
-     "Reasoned from shape — the flagged hour sits below the hours before it, and the evening "
-     "tails off as the air cools — and named the mechanism, not the magnitude.",
+     "Read the hour before, which recorded almost nothing — impossible for a circuit that was "
+     "on — and recognised the missing usage bundled into the next read. Named the mechanism, "
+     "not the magnitude.",
      "The reasoning is sound and the evidence is absent. A sustained overnight load that does not "
      "ease as it cools does look like a compressor fault when shift schedules are not an input."],
     ["Effect",
-     "“Log this as expected warm-night cooling load on HVAC Unit 1… so the same midnight hour is "
-     "not re-flagged.” Specific, and closes the loop.",
+     "“Log this as a known meter dropout… and ask metering to check the logger's communications "
+     "reliability.” No technician sent on the scariest number in the set.",
      "Sends a technician overnight to a healthy compressor bank. Confidently wrong is worse than "
      "uncertain: at 0.78 it clears the commit gate."],
 ], [0.45, 3.4, 3.35])
@@ -364,8 +366,9 @@ table(doc, ["Failure", "What went wrong", "Diagnosis"], [
      "Hourly kWh underdetermines which fault; two mechanisms with the same load signature are "
      "indistinguishable at this sampling rate.", [("Evidence", B)]],
     ["1 overclaim, 7 hedges",
-     "Confidence averages 0.70 when right and 0.75 when wrong — miscalibrated, and inverted "
-     "rather than merely noisy. A property of the model, not of our inputs.", [("Model", B)]],
+     "0.70 when right, 0.75 when wrong — but the second figure is the mean of only two "
+     "cases, and the distributions overlap almost entirely (right: 0.52–0.88). Confidence "
+     "carries no usable signal about correctness.", [("Model", B)]],
     ["Decision value",
      "82% precision, 100% recall, and following the tool still costs 4.7× dispatching on "
      "everything. We asked “what is this spike?” when the decision needs “should I dispatch?”. A "
@@ -382,7 +385,8 @@ para(doc, [("Our failure condition names this confusion as the trigger to requir
             "correct read. ", {}),
            ("Sibling co-movement — net negative, recall 100% → 78%.", {"b": True, "c": AMBER}),
            (" A fault lifts one meter and site activity lifts every meter, so this fixed the Peak "
-            "Throughput case and un-inverted calibration, but it cannot tell one shared cause "
+            "Throughput case and improved calibration agreement, but it cannot tell one shared "
+            "cause "
             "from two simultaneous single-asset events, and a real refrigerant leak was read as "
             "operational.", {})])
 para(doc, [("Neither dead end is about which variables the model receives. Both are about the "
@@ -412,11 +416,22 @@ para(doc, [("97% of the tool's cost is exposure, not spend. ", B),
            (" counts as a miss because nobody is dispatched — if monitoring reliably catches the "
             "fault later at reduced cost, the figure falls; we have no evidence either way, so we "
             "scored the conservative reading.", {})])
-para(doc, [("The calibration failure is the one we did not anticipate, and it matters most. ", B),
-           ("The 0.75 commit gate selects for errors: it admits the single overclaim while "
-            "hedging seven correct calls. Only 4 of 25 spikes clear it, so 17 of 20 real faults "
-            "are told to “monitor” and nobody is dispatched. A rubric that stopped at precision "
-            "and recall would have reported success.", {})])
+para(doc, [("The gate was set by convention, and our own numbers contained the right value. ", B),
+           ("Dispatching costs $300 with certainty; not dispatching costs p × $2,000, so "
+            "break-even is p > 0.15 — and we gated at 0.75, five times too high. The model's "
+            "lowest confidence anywhere on the core set is 0.52, so every case clears the "
+            "economically correct bar and none clear ours. 12 of the 20 true faults are blocked "
+            "by that threshold alone, with the classification already calling for a "
+            "technician.", {})])
+para(doc, [("Fixing the gate is necessary and not sufficient. ", B),
+           ("Removing it drops the cost from $35,200 to $15,100 — still worse than dispatching "
+            "on everything, and the reason is the test set. With 20 faults among 25 anomalies a "
+            "perfect classifier spends $6,000 against blanket dispatch's $7,500, so the entire "
+            "achievable prize is $1,500 while one missed fault costs $2,000. No policy that "
+            "ever withholds a dispatch from a real fault can win here. That base rate follows "
+            "from discarding the detector's 562 false alarms, which makes the scope limitation "
+            "in §7 the binding constraint on decision value rather than a footnote. A rubric "
+            "that stopped at precision and recall would have reported success.", {})])
 
 # ───────────────────────────── PART D ────────────────────────────────────────
 head(doc, "5.4  Part D — The measurement layer")
@@ -445,9 +460,12 @@ table(doc, ["Input signal", "→ Construct", "Correct?"], [
 para(doc, [("Error. ", B),
            ("Against held-out labels the top-level class is right on 12 of 14 and the subtype on "
             "7 of 14 — the family of cause is measured reasonably well, the specific mechanism is "
-            "close to a coin flip. Confidence is worse than uninformative: 0.70 when right, 0.75 "
-            "when wrong, so it runs against correctness. We know this because the labels came "
-            "from a documented injection process and were opened only after every prediction was "
+            "close to a coin flip. Confidence is uninformative: 0.70 when right and 0.75 when "
+            "wrong, though with only two wrong cases that ordering is not something 14 cases "
+            "can establish — at subtype level, where the split is 7/7, it runs the other way. "
+            "What the data does support is that the two distributions overlap almost entirely, "
+            "so confidence does not discriminate. We know this because the labels came from a "
+            "documented injection process and were opened only after every prediction was "
             "written.", {})])
 para(doc, [("Stability. ", B),
            ("Across three runs on the same inputs, the class, subtype and recommended action were "

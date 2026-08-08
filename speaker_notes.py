@@ -133,8 +133,9 @@ a stuck compressor on kilowatt-hours alone. A specification failure — Theory B
 exactly where it said it would be.
 
 Calibration. Confidence averages point-seven-zero when right and
-point-seven-five when wrong. Inverted, not just noisy — that's the model, not
-our data.
+point-seven-five when wrong — and I'd flag that the second number is the mean of
+just two cases. The honest reading is that the two distributions overlap almost
+completely, so confidence tells you nothing about whether the answer is right.
 
 The third one is worth your attention.""",
 
@@ -169,8 +170,9 @@ precision fell from eighty-two to sixty-four percent. A busy day adds seven to
 ten kilowatt-hours; the alarm doesn't fire until twenty, so it never reaches the
 detector. A second fix cost us recall. We merged neither.
 
-Three. Don't trust the confidence as a probability — it's inverted. And don't
-build a dispatch gate on it, which is exactly what we did.
+Three. Don't trust the confidence as a probability. It carries no usable signal
+about correctness — and don't build a dispatch gate on it, which is exactly what
+we did.
 
 Four. Everything is synthetic: real temperature, generated consumption, no
 maintenance logs.
@@ -192,10 +194,13 @@ We also wrote down what would make us pull it — precision under sixty percent
 over thirty days, exceptions over twenty percent, or any month the tool costs
 more than dispatching on everything.
 
-And what we'd build first isn't a better prompt. It's the dispatch rule: replace
-the fixed gate with an expected-cost rule using that
-hundred-and-sixty-seven-to-one ratio. The labels are already good enough — the
-decision layer on top of them is losing the money.""",
+And what we'd build first isn't a better prompt. It's the dispatch rule. Our own
+numbers put break-even at fifteen percent — three hundred dollars to dispatch
+against a two-thousand-dollar miss — and we gated at seventy-five. That one
+change cuts the loss from thirty-five thousand to fifteen thousand. It still
+doesn't beat dispatching on everything, and that's the second fix: at an eighty
+percent fault rate the whole prize is fifteen hundred dollars while a single miss
+costs two thousand, so the test set itself has to get harder.""",
 
 11: """Where we landed.
 

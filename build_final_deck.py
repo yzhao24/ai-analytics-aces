@@ -440,8 +440,9 @@ table(s, L, yy + 0.9, CW,
         "Neither shift schedules nor rental logs are inputs we receive",
         [("Specification", {"b": True})]],
        [[("Calibration", {"b": True})], [("1 overclaim, 43%", {"c": RED, "b": True})],
-        "Confidence averages 0.70 when right and 0.75 when wrong — inverted, "
-        "not merely noisy", [("Model", {"b": True})]],
+        "0.70 when right, 0.75 when wrong — but that second figure is the mean of only "
+        "two cases, and the distributions overlap almost entirely. Confidence carries no "
+        "usable signal about correctness", [("Model", {"b": True})]],
        [[("Decision value", {"b": True})], [("$35,200 vs $7,500", {"c": RED, "b": True})],
         "Accurate labels, and following the tool still costs 4.7× dispatching on "
         "everything", [("Question", {"b": True})]]],
@@ -477,12 +478,13 @@ tb(s, L + 0.5, yy + 1.3, cwh - 1.0, 2.2,
 
 x2 = L + cwh + 0.7
 card(s, x2, yy, cwh, 3.7, fill=None, line=BLACK, lw=2)
-tb(s, x2 + 0.5, yy + 0.38, cwh - 1.0, 0.7, "We asked the wrong question",
+tb(s, x2 + 0.5, yy + 0.38, cwh - 1.0, 0.7, "The gate was set by convention",
    size=29, bold=True)
 tb(s, x2 + 0.5, yy + 1.3, cwh - 1.0, 2.2,
-   "We built for “what is this spike?”. The decision needs “should I dispatch?”. "
-   "A correct label at 0.72 confidence still sends nobody — so accuracy and "
-   "usefulness came apart.", size=25, line=1.05)
+   [[("Our own numbers set break-even at ", {}), ("p > 0.15", {"b": True}),
+     (" — $300 to dispatch against a $2,000 miss. We gated at 0.75, five times too "
+      "high, and never derived it from the cost ratio we opened the talk with.", {})]],
+   size=25, line=1.05)
 stamp(s, 8)
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -500,8 +502,9 @@ rows = [
      "Adding shift schedules dropped precision from 82% to 64%: a day planned at 130% adds "
      "7–10 kWh, the alarm fires at 20, so a realistic busy day never reaches the detector."),
     ("Confidence should not be trusted as a probability.",
-     "It is inverted — 0.70 when right, 0.75 when wrong. Do not build a dispatch gate on it, "
-     "which is exactly the mistake we made."),
+     "0.70 when right, 0.75 when wrong, and the two distributions overlap almost entirely. "
+     "It carries no usable signal — so do not build a dispatch gate on it, which is exactly "
+     "what we did."),
     ("Every result is on synthetic data.",
      "Real temperature from Open-Meteo, but generated consumption. No maintenance logs, "
      "so no validation against a fault someone actually found."),
@@ -541,10 +544,11 @@ blocks = [
         "Any month where following the tool costs more than dispatching on everything",
     ]),
     ("Build next, in order", GREEN, [
-        "Replace the fixed 0.75 gate with an expected-cost rule using the 167:1 ratio — "
-        "this is the fix that turns 82% precision into money saved",
-        "Move detection from the sub-system to the facility, so site-wide events stop "
-        "looking like nine independent faults",
+        "Replace the fixed 0.75 gate with an expected-cost rule. Break-even is p > 0.15, "
+        "not 0.75 — this alone cuts the loss from $35,200 to $15,100",
+        "A test set with a realistic base rate. At 80% faults the whole prize is $1,500 "
+        "and one miss costs $2,000, so no policy can beat blanket dispatch",
+        "Move detection from the sub-system to the facility",
         "Field pilot against real maintenance logs",
     ]),
 ]

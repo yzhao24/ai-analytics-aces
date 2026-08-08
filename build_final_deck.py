@@ -11,14 +11,13 @@ The Booth canvas is 26.67 x 15 in, roughly 2x a normal 13.3in deck, so type
 sizes here are about double what they would be elsewhere.
 """
 
-import copy
 from pathlib import Path
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-from pptx.util import Emu, Inches, Pt
+from pptx.util import Inches, Pt
 
 from speaker_notes import TIMING, notes_for
 

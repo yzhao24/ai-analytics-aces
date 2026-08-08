@@ -10,7 +10,7 @@ notes pane. Print it, or read it off a phone.
 from pathlib import Path
 
 import docx
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.enum.text import WD_BREAK
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 

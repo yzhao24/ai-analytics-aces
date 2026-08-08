@@ -32,8 +32,6 @@ Usage:
 """
 
 import argparse
-import json
-import math
 import sys
 from pathlib import Path
 

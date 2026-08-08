@@ -38,3 +38,6 @@ booth_template.pptx
 
 # Nested clone of this same repo — not a submodule
 ai-analytics-aces/
+
+# Regenerable weather pull — fetch_weather.py rewrites it
+weather_real.csv

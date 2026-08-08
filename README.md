@@ -12,19 +12,31 @@ with the statistical evidence behind the call.
 
 | File | What it is |
 |---|---|
+| **The product** | |
 | `energy_anomaly_dashboard.py` | The whole dashboard — all four screens and the agent |
 | `run_dashboard.py` | Launcher that works from any working directory |
 | `classifier.py` | The AI classification layer. Calls Claude, writes `classifications_llm.json` |
+| `input_guard.py` | Checks incoming meter data against the settled history |
+| **The data** | |
 | `generate_dataset.py` | Builds the dataset from scratch. Edit this when the data needs to change |
-| `fetch_weather.py` | Pulls real hourly temperatures from Open-Meteo |
-| `verify_review_numbers.py` | Reproduces the figures cited in the adversarial reviews |
-| `score_rubric.py` | Scores the Assignment 2 evaluation rubric from the classifier output |
-| `stability_test.py` | Repeat runs and bias breakdown |
-| `input_guard.py` | Sanity checks for incoming meter data |
+| `fetch_weather.py` | Real hourly temperatures from Open-Meteo. Also imported by the generator |
 | `dummy_data_set2.xlsx` | The dataset the dashboard reads (9 sheets, 12 months) |
 | `registries.xlsx` | Facilities, sub-systems, and the 14 classification types |
 | `classifications_llm.json` | Classifier output. Overlaid on the workbook at load time |
-| `dummy_data_set1.xlsx` | The original 30-day dataset. Kept for reference, no longer read |
+| **Evaluation** | |
+| `score_rubric.py` | Scores the Assignment 2 rubric and the decision value |
+| `stability_test.py` | Repeat runs and bias breakdown → `stability_runs.json` |
+| `usability_test.py` | Rater sheets, scoring, and the optional LLM judge → `usability_judge.json` |
+| `usability_cases.md` | The blind rating pack handed to two human raters |
+| `verify_review_numbers.py` | Reproduces the figures cited in the adversarial reviews |
+| **Deliverables** | |
+| `build_assignment2_docx.py` | Group Assignment 2 as a 5-page Word document |
+| `build_final_deck.py` | The final presentation, on the Booth master |
+| `build_speech_doc.py` | The speaking script as cue cards, one page per speaker |
+| `speaker_notes.py` | The spoken script and its timing — the source both of the above read |
+| `DEMO_SCRIPT.md` | Demo recording script, with every figure verified against the live panel |
+| `appendix_prompt.txt` · `appendix_cases.json` | Generated appendix inputs — do not hand-edit |
+| **Specs** | |
 | `wireframe_v2.md` · `data_schema_v2.md` | The specs this was built against |
 
 ---
@@ -223,15 +235,23 @@ On the core stratum of `dummy_data_set2.xlsx`, classified by `claude-opus-5`:
 |---|---|---|
 | Precision, equipment fault | **82%** | ≥75% ✅ |
 | Recall, equipment fault | **100%** | ≥70% ✅ |
-| Avg time to classify | **0.2 min** | <5 min ✅ |
+| Avg time to classify | **10.0 s** (17.8 s max) | <5 min ✅ |
 
-Reproduce with `python3 classifier.py --score`.
+Reproduce with `python3 score_rubric.py`.
 
 **Decision value fails, and that matters more than the two passes above.** Following
 the tool costs $35,200 against $7,500 for dispatching a technician to every spike.
 Only 4 of 25 spikes clear the 0.75 confidence gate, so 17 of 20 real faults get
 "monitor" and nobody is sent. The classifier is accurate and the product still loses
 money. The History screen shows the full comparison.
+
+Two things drive it, and neither is the classifier. The gate is set by convention:
+a dispatch costs $300 against a $2,000 miss, so break-even is `p > 0.15` and we
+gated at 0.75 — five times too high. Removing the gate entirely drops the cost to
+$15,100, which is still worse than blanket dispatch, because with 20 faults among
+25 anomalies a perfect classifier saves only $1,500 while one missed fault costs
+$2,000. The base rate caps the prize below the price of a single mistake, and that
+base rate comes from discarding the detector's false alarms — see below.
 
 ---
 

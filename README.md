@@ -17,6 +17,7 @@ with the statistical evidence behind the call.
 | `run_dashboard.py` | Launcher that works from any working directory |
 | `classifier.py` | The AI classification layer. Calls Claude, writes `classifications_llm.json` |
 | `input_guard.py` | Checks incoming meter data against the settled history |
+| `operations_log.py` | Planned operations the manager declares. Evidence for the classifier, never a suppression |
 | **The data** | |
 | `generate_dataset.py` | Builds the dataset from scratch. Edit this when the data needs to change |
 | `fetch_weather.py` | Real hourly temperatures from Open-Meteo. Also imported by the generator |
@@ -160,6 +161,45 @@ r['kwh'] *= 1000                      # watts, not kilowatts
 r.loc[r.index[:6], 'system_id'] = 'SYS-999'
 r.to_csv('sample_bad_export.csv', index=False)"
 ```
+
+## Declaring planned operations
+
+Two of the classifier's errors are the same shape: a Peak Throughput Day and a
+Temporary Equipment Rental, each read as an equipment fault. Neither shift
+schedules nor rental logs are inputs the product receives, so nothing separates a
+busy shift from a stuck compressor on kWh alone.
+
+**This is not the remedy we already measured failing.** The `experiment/shift-schedule`
+branch gave the model a schedule and asked it to *infer* whether a day was busy;
+precision fell from 82% to 64%, because a day planned at 130% of normal adds 7–10 kWh
+and the alarm does not fire until 20. A realistic busy day never reaches the detector.
+
+Declaring is a different act. In **Settings → Planned Operations** the manager records
+an event they already know about — an extra shift, a rented chiller, a maintenance
+window — scoped to a facility, a sub-system, and a time range. That is testimony, not
+inference, so it does not have to clear a detection threshold to be useful.
+
+Anything flagged inside a declared window shows the declaration in the Classification
+Panel, and `classifier.py` passes it to the model as evidence. Declarations recorded
+after a spike was classified say so, since the stored classification could not have
+seen them — re-run the classifier to take them into account.
+
+**It never suppresses an alert and never changes the agent's decision.** A compressor
+can fail during a busy shift, and at a 167:1 miss-to-false-alarm ratio, auto-dismissing
+anything inside a declared window is precisely the wrong direction. The prompt says the
+same thing to the model: a declaration is credible evidence about what was happening,
+not proof of cause.
+
+Declarations live in `operations_log.json`, which is local state and gitignored.
+`python3 operations_log.py` runs the overlap and scoping checks.
+
+**On measuring it.** Declaring the injected operational events in the synthetic test set
+is close to handing over the ground-truth label, so any precision gain measured that way
+is circular and should not be quoted. What can be tested honestly is the failure
+direction: a declaration covering a window where a real fault occurred must not talk the
+classifier out of calling it a fault.
+
+---
 
 ## The three actions
 

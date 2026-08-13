@@ -41,3 +41,6 @@ ai-analytics-aces/
 
 # Regenerable weather pull — fetch_weather.py rewrites it
 weather_real.csv
+
+# Manager-declared planned operations — runtime state, not source
+operations_log.json

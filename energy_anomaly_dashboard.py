@@ -14,6 +14,7 @@ import math
 from pathlib import Path
 
 import input_guard
+import operations_log
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -913,6 +914,40 @@ def render_classification_panel(anomaly_id):
         st.metric("System", system.system_name if system is not None else "Unknown")
         st.metric("Time", f"{anomaly.detected_at:%I:%M %p · %A}")
 
+    # ── Declared operations covering this window
+    _win = operations_log.window_of(anomaly)
+    _declared = operations_log.covering(
+        operations_log.load(), anomaly.facility_id, anomaly.system_id, *_win)
+    if _declared:
+        _classified_at = pd.Timestamp(getattr(anomaly, "classified_at", None) or pd.NaT)
+        _newest = max(pd.Timestamp(d["declared_at"]) for d in _declared)
+        if pd.notna(_classified_at) and _newest > _classified_at:
+            _declared_note = (
+                "Declared after this spike was classified, so the stored "
+                "classification did not see it — re-run the classifier to take it "
+                "into account."
+            )
+        else:
+            _declared_note = "The classifier was given this as evidence."
+        items = "".join(
+            f'<div style="margin-top:7px"><span style="font-weight:700">'
+            f'{operations_log.describe(d)}</span>'
+            + (f'<div class="muted" style="margin-top:2px">'
+               f'Manager\'s note: “{d["note"]}”</div>' if d.get("note") else "")
+            + "</div>"
+            for d in _declared
+        )
+        st.markdown(
+            f'<div class="card" style="border-left:4px solid {AMBER}">'
+            f'<span class="badge" style="background:{AMBER}22;color:{AMBER};'
+            f'border:1px solid {AMBER}">DECLARED OPERATION</span>'
+            f'{items}'
+            f'<div class="muted" style="margin-top:9px">{_declared_note}'
+            f' This does not suppress the alert — equipment can fail during '
+            f'planned operations.</div></div>',
+            unsafe_allow_html=True,
+        )
+
     # ── AI classification
     section("AI Classification")
     if classification is None:
@@ -1722,6 +1757,79 @@ def render_settings():
                     f"{len(findings)} thing(s) to check before relying on this import."
                 )
                 render_findings(findings)
+
+    # ── Planned operations
+    section("Planned Operations")
+    st.markdown(
+        '<div class="muted">Tell the system about work you already know about — an '
+        'extra shift, a rented chiller, a maintenance window. Anything flagged '
+        'inside a declared window is shown with that context, and the classifier '
+        'is given it as evidence.<br><b>It never suppresses an alert.</b> Equipment '
+        'can fail during planned operations, and a missed fault costs far more than '
+        'a needless visit.</div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.form("ops_add", clear_on_submit=True):
+        c1, c2, c3 = st.columns([2, 2, 3])
+        fac_opts = [operations_log.ANY] + list(data["facility_registry"].facility_id)
+        with c1:
+            f_id = st.selectbox("Facility", fac_opts, format_func=lambda v: (
+                "All facilities" if v == operations_log.ANY else
+                facs.set_index("facility_id").facility_name.get(v, v)))
+        with c2:
+            sysr = data["system_registry"]
+            sys_opts = [operations_log.ANY] + list(
+                sysr[sysr.facility_id == f_id].system_id if f_id != operations_log.ANY
+                else sysr.system_id)
+            s_id = st.selectbox("Sub-system", sys_opts, format_func=lambda v: (
+                "All sub-systems" if v == operations_log.ANY else
+                sysr.set_index("system_id").system_name.get(v, v)))
+        with c3:
+            ev = st.selectbox("What is happening", operations_log.EVENT_TYPES)
+
+        d1, t1, d2, t2 = st.columns(4)
+        _last = pd.Timestamp(data["energy_readings"].recorded_at.max())
+        with d1:
+            sd = st.date_input("Starts", _last.date())
+        with t1:
+            stime = st.time_input("at", pd.Timestamp("2026-01-01 06:00").time())
+        with d2:
+            ed = st.date_input("Ends", _last.date())
+        with t2:
+            etime = st.time_input("at ", pd.Timestamp("2026-01-01 14:00").time())
+
+        note = st.text_input("Note for whoever reads this later (optional)",
+                             placeholder="e.g. extra shift for the retail push")
+        if st.form_submit_button("Declare this operation", width="content"):
+            try:
+                entry = operations_log.add(
+                    f_id, s_id,
+                    pd.Timestamp.combine(sd, stime), pd.Timestamp.combine(ed, etime),
+                    ev, note)
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                st.success(f"Declared: {operations_log.describe(entry)}")
+
+    _ops = operations_log.load()
+    if not _ops:
+        st.caption("Nothing declared yet.")
+    else:
+        for entry in _ops:
+            col, act = st.columns([9, 1])
+            with col:
+                st.markdown(
+                    f'<div style="padding:5px 0"><b>{operations_log.describe(entry)}</b>'
+                    + (f'<div class="muted">“{entry["note"]}”</div>'
+                       if entry.get("note") else "")
+                    + "</div>",
+                    unsafe_allow_html=True,
+                )
+            with act:
+                if st.button("Remove", key=f"ops_rm_{entry['entry_id']}"):
+                    operations_log.remove(entry["entry_id"])
+                    st.rerun()
 
     if st.button("Save Settings", width="content"):
         st.success(

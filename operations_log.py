@@ -106,11 +106,17 @@ def covering(rows, facility_id, system_id, start, end):
     start, end = pd.Timestamp(start), pd.Timestamp(end)
     hits = []
     for r in rows:
-        if r["facility_id"] not in (ANY, facility_id):
+        # load() already tolerates a corrupt file, so a half-written row must not
+        # be the thing that takes the panel down. Skip what we cannot read.
+        try:
+            if r.get("facility_id") not in (ANY, facility_id):
+                continue
+            if r.get("system_id") not in (ANY, system_id):
+                continue
+            starts, ends = pd.Timestamp(r["starts_at"]), pd.Timestamp(r["ends_at"])
+        except (KeyError, TypeError, ValueError):
             continue
-        if r["system_id"] not in (ANY, system_id):
-            continue
-        if pd.Timestamp(r["starts_at"]) <= end and pd.Timestamp(r["ends_at"]) >= start:
+        if starts <= end and ends >= start:
             hits.append(r)
     return hits
 
@@ -124,9 +130,9 @@ def window_of(anomaly):
 
 def describe(entry):
     scope = []
-    if entry["facility_id"] != ANY:
+    if entry.get("facility_id", ANY) != ANY:
         scope.append(entry["facility_id"])
-    if entry["system_id"] != ANY:
+    if entry.get("system_id", ANY) != ANY:
         scope.append(entry["system_id"])
     where = " · ".join(scope) if scope else "all facilities"
     s, e = pd.Timestamp(entry["starts_at"]), pd.Timestamp(entry["ends_at"])
@@ -187,6 +193,14 @@ def _selftest():
         good = ids == sorted(want)
         ok &= good
         print(f"  {'ok  ' if good else 'FAIL'} {label:48} {ids}")
+
+    malformed = covering(rows + [{"entry_id": "junk"}], "FAC-002", "SYS-005",
+                         t("2026-07-27 20:00"), t("2026-07-28 04:00"))
+    survives = sorted(h["entry_id"] for h in malformed) == ["a", "b"]
+    ok &= survives
+    print(f"  {'ok  ' if survives else 'FAIL'} "
+          f"{'a half-written row is skipped, not fatal':48} "
+          f"{sorted(h['entry_id'] for h in malformed)}")
 
     ev = as_prompt_evidence(covering(rows, "FAC-002", "SYS-005",
                                      t("2026-07-27 20:00"), t("2026-07-28 04:00")))

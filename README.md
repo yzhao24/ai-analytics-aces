@@ -201,10 +201,36 @@ classifier out of calling it a fault.
 
 ---
 
+## The dispatch threshold
+
+The agent recommends dispatch only when `z ≥ 3.0` **and** the classifier's confidence
+clears a threshold. That threshold ships at **0.75**, and every figure in this README
+is scored against it.
+
+Your own cost model implies a different number. A visit costs $300 for certain; not
+visiting costs `p × $2,000`. Dispatching therefore pays whenever **p > 0.15** — five
+times below the shipped default. **Settings → Dispatch threshold** now sets it live
+and shows the gap; the agent, the Review Recommended badge and the History screen's
+decision value all read the same value.
+
+Moving it to 0.15 takes the cost of following the tool from $35,200 to $15,100 on
+identical predictions. That is still worse than dispatching on every spike ($7,500),
+because 20 of the 25 anomalies are genuine faults — a perfect classifier saves $1,500
+while one missed fault costs $2,000. The threshold is the first fix, not the whole one.
+
+The default is left at 0.75 deliberately, so the numbers reported here and in the
+evaluation continue to describe what the product does out of the box.
+
+---
+
 ## The three actions
 
 Every recommendation is one of **dispatch**, **monitor**, or **dismiss**, and the same
-three verbs run through the whole system — the classifier's output schema, the standing
+three verbs run through the whole system. The Classification Panel offers all three,
+with the agent's recommendation marked and made primary — it used to offer whichever
+action matched the top-level class, so an equipment fault showed a Dispatch button even
+when the agent had just recommended monitor. All three stay available so a manager who
+disagrees with the agent is not stuck — the classifier's output schema, the standing
 action attached to each of the 14 classification types, the button in the Classification
 Panel, and what gets written to `manager_actions`. A fourth path, **Flag for Engineer
 Review**, is always available and records as `escalated`.

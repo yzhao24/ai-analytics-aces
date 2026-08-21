@@ -127,7 +127,10 @@ def overlay_llm_classifications(d):
                 "confidence_score": r["confidence_score"],
                 "explanation_text": r["explanation_text"],
                 "created_at": pd.NaT,
-                "review_recommended": r["confidence_score"] < 0.75,
+                # Snapshot against the shipped default — load_data() is cached, so
+                # this cannot track the Settings slider. The panel recomputes it
+                # live from commit_threshold() instead.
+                "review_recommended": r["confidence_score"] < COMMIT_THRESHOLD_DEFAULT,
                 "weather_adjusted": True,
                 "latency_seconds": r.get("latency_seconds"),
                 "recommended_action": r.get("recommended_action"),
@@ -369,13 +372,34 @@ def tool_fetch_comparable_events(data, anomaly, z_score, z_by_anomaly):
 
 DECISION_RANK = {"dismiss": 0, "monitor": 1, "dispatch": 2}
 
+# The dispatch gate. 0.75 is the value the product shipped with and every figure
+# in the evaluation is scored against it, so it stays the default. It is no
+# longer hard-coded in three places: Settings writes to session state and both
+# the agent and the Review Recommended badge read it from here.
+#
+# BREAK_EVEN is what the cost model actually implies -- dispatching costs
+# DISPATCH_COST for certain, not dispatching costs p x MISS_COST, so a visit is
+# worth it whenever p > DISPATCH_COST / MISS_COST. That is 0.15, five times
+# below the shipped default. Surfacing both is the point: the gap between them
+# is the product's largest known defect.
+COMMIT_THRESHOLD_DEFAULT = 0.75
+DISPATCH_COST = 300.0
+MISS_COST = 2000.0
+BREAK_EVEN = DISPATCH_COST / MISS_COST
 
-def decide(data, z_score, classification):
+
+def commit_threshold():
+    """The confidence a classification must reach before the agent will dispatch."""
+    return float(st.session_state.get("conf_threshold", COMMIT_THRESHOLD_DEFAULT))
+
+
+def decide(data, z_score, classification, threshold=None):
     """The agent's decision rule, shared by the panel and the batch scorer.
 
     Two gates: a statistical one on the z-score and confidence, then a semantic
     cap at whatever the matched classification itself warrants.
     """
+    threshold = commit_threshold() if threshold is None else threshold
     if z_score < 2.0:
         return "dismiss"
 
@@ -384,7 +408,7 @@ def decide(data, z_score, classification):
     )
     decision = (
         "dispatch"
-        if z_score >= 3.0 and confidence is not None and confidence >= 0.75
+        if z_score >= 3.0 and confidence is not None and confidence >= threshold
         else "monitor"
     )
 
@@ -757,6 +781,7 @@ st.session_state.setdefault("screen", "Dashboard")
 st.session_state.setdefault("open_anomaly", None)
 st.session_state.setdefault("status_overrides", {})
 st.session_state.setdefault("manager_notes", {})
+st.session_state.setdefault("actions_taken", {})
 st.session_state.setdefault("page", 0)
 
 ano_all = build_anomaly_view().copy()
@@ -966,7 +991,9 @@ def render_classification_panel(anomaly_id):
         color = CLASS_COLOR.get(top_class, GREY)
         conf = float(classification.confidence_score)
         conf_label = "High" if conf >= 0.8 else "Medium" if conf >= 0.6 else "Low"
-        review = bool(classification.review_recommended)
+        # Recomputed here rather than read from the cached frame, so the
+        # badge follows the Settings slider without a full reload.
+        review = conf < commit_threshold()
 
         badges = (
             f'<span class="badge" style="background:{color};color:#fff">'
@@ -1024,6 +1051,17 @@ def render_classification_panel(anomaly_id):
     model_action = (
         classification.get("next_action") if classification is not None else None
     )
+    # The classifier writes next_action from its own recommended_action, which the
+    # agent can then cap. When they disagree we used to print the classifier's
+    # "send someone tonight" directly beneath a MONITOR verdict — two instructions,
+    # no indication which one to follow. Say plainly that they disagree instead.
+    model_rec = (
+        classification.get("recommended_action") if classification is not None else None
+    )
+    overruled = (
+        model_rec is not None
+        and DECISION_RANK.get(model_rec, 0) > DECISION_RANK[decision]
+    )
     action_text = model_action or recommended_action_text(
         decision,
         anomaly,
@@ -1035,6 +1073,10 @@ def render_classification_panel(anomaly_id):
     symptom = (
         classification.get("symptom_to_check") if classification is not None else None
     )
+    # A technician symptom under a decision that sends nobody reads as an
+    # instruction. Keep it only when we are dispatching.
+    if decision != "dispatch":
+        symptom = None
 
     pattern_html = ""
     if classification is not None:
@@ -1055,6 +1097,18 @@ def render_classification_panel(anomaly_id):
         f'<div class="muted" style="margin-top:9px">{agent["weather_context"]}</div>'
         f'<div style="margin-top:11px;font-size:13px;font-weight:600;color:{dc}">'
         f"▸ {action_text}</div>"
+        + (
+            f'<div class="muted" style="margin-top:9px;padding-top:8px;'
+            f'border-top:1px dashed {BORDER}">The classifier would '
+            f"<b>{model_rec}</b> on this spike; the agent's rule caps it at "
+            f"<b>{decision}</b> because confidence {conf:.0%} is below the "
+            f"{commit_threshold():.0%} dispatch threshold. "
+            f"<b>The agent's verdict above is what the product recommends.</b> "
+            f"The instruction just above is the classifier's, and it has not been "
+            f"acted on.</div>"
+            if overruled
+            else ""
+        )
         + (
             f'<div class="muted" style="margin-top:9px;padding-top:8px;'
             f'border-top:1px dashed {BORDER}"><b>Symptom for the technician</b><br>'
@@ -1144,28 +1198,48 @@ def render_classification_panel(anomaly_id):
     # The button records which of the three actions was taken, not merely that
     # the manager agreed. "accepted" could not distinguish a dispatch from a
     # monitor, which is exactly the difference the resolution metrics need.
+    #
+    # This used to key off top_level_class, so an equipment_fault always offered
+    # "Dispatch Technician" even when the agent had just recommended MONITOR --
+    # the panel argued with its own button on 18 of 25 cases, and the decision
+    # value we report models the verdict, not the button. The recommended action
+    # is now the agent's, and the other two stay available so a manager who
+    # disagrees is not stuck.
     BY_ACTION = {
-        "dispatch": ("✓ Dispatch Technician", "classified", "dispatched"),
-        "monitor": ("✓ Log as Operational — Monitor 24hr", "classified", "monitoring"),
-        "dismiss": ("✓ Dismiss — Meter/Sensor Error", "dismissed", "dismissed"),
+        "dispatch": ("Dispatch Technician", "classified", "dispatched"),
+        "monitor": ("Monitor for 24 hours", "classified", "monitoring"),
+        "dismiss": (
+            "Dismiss — Meter/Sensor Error" if top_class == "data_anomaly"
+            else "Dismiss — Known Operational Event", "dismissed", "dismissed"),
     }
-    by_class = {"equipment_fault": "dispatch", "operational_variation": "monitor",
-                "data_anomaly": "dismiss"}
-    primary_label, new_status, taken = BY_ACTION[by_class.get(top_class, decision)]
 
-    left, right = st.columns(2)
-    with left:
-        if st.button(primary_label, key="act_primary", width="stretch"):
-            st.session_state.status_overrides[anomaly_id] = new_status
-            st.session_state.open_anomaly = None
-            build_anomaly_view.clear()
-            st.rerun()
-    with right:
-        if st.button("Flag for Engineer Review", key="act_flag", width="stretch"):
-            st.session_state.status_overrides[anomaly_id] = "escalated"
-            st.session_state.open_anomaly = None
-            build_anomaly_view.clear()
-            st.rerun()
+    def take(action):
+        label, new_status, taken = BY_ACTION[action]
+        st.session_state.status_overrides[anomaly_id] = new_status
+        st.session_state.actions_taken[anomaly_id] = taken
+        st.session_state.open_anomaly = None
+        build_anomaly_view.clear()
+        st.rerun()
+
+    ordered = [decision] + [a for a in ("dispatch", "monitor", "dismiss")
+                            if a != decision]
+    cols = st.columns(3)
+    for col, action in zip(cols, ordered):
+        with col:
+            recommended = action == decision
+            label = ("✓ " if recommended else "") + BY_ACTION[action][0]
+            if st.button(label, key=f"act_{action}", width="stretch",
+                         type="primary" if recommended else "secondary",
+                         help="The agent's recommendation" if recommended
+                              else "Overrules the agent's recommendation"):
+                take(action)
+
+    if st.button("Flag for Engineer Review", key="act_flag", width="content"):
+        st.session_state.status_overrides[anomaly_id] = "escalated"
+        st.session_state.actions_taken[anomaly_id] = "escalated"
+        st.session_state.open_anomaly = None
+        build_anomaly_view.clear()
+        st.rerun()
 
     # ── Exception — always available
     # Three actions cannot cover every spike, and a manager forced to pick the
@@ -1205,6 +1279,7 @@ def render_classification_panel(anomaly_id):
                 if note.strip():
                     st.session_state.manager_notes[anomaly_id] = note.strip()
                     st.session_state.status_overrides[anomaly_id] = "exception"
+                    st.session_state.actions_taken[anomaly_id] = "exception"
                     st.session_state.open_anomaly = None
                     build_anomaly_view.clear()
                     st.rerun()
@@ -1214,6 +1289,7 @@ def render_classification_panel(anomaly_id):
             if existing and st.button("Remove", key="act_exc_clear", width="stretch"):
                 st.session_state.manager_notes.pop(anomaly_id, None)
                 st.session_state.status_overrides.pop(anomaly_id, None)
+                st.session_state.actions_taken.pop(anomaly_id, None)
                 build_anomaly_view.clear()
                 st.rerun()
 
@@ -1337,6 +1413,12 @@ def render_dashboard():
     n_confirmed = int(
         ((acts.action_taken == "dispatched") & (acts.acted_at >= month_start)).sum()
     ) if month_start is not None else 0
+    # Actions taken in this session count too. Previously the panel computed which
+    # of the three was taken and discarded it, so dispatching from the UI never
+    # moved this number.
+    n_confirmed += sum(
+        1 for a in st.session_state.actions_taken.values() if a == "dispatched"
+    )
 
     reg = data["classification_registry"].set_index("classification_id")
     exposure = 0.0
@@ -1703,24 +1785,53 @@ def render_settings():
         st.slider(
             "Spike threshold (kWh above baseline)",
             5.0, 100.0, float(cfg.spike_kwh_threshold), 1.0,
-            help="An alert fires when a reading exceeds baseline by more than this.",
+            disabled=True,
+            help="Detection thresholds are fixed in generate_dataset.py and applied "
+                 "when the dataset is built, so changing them here would not "
+                 "re-run detection. Shown read-only rather than pretending.",
         )
     with b:
         st.slider(
             "Duration threshold (minutes)",
             15, 240, int(cfg.spike_duration_threshold_min), 15,
-            help="The spike must persist this long before an anomaly is created.",
+            disabled=True,
+            help="Fixed at detection time, as above. Read-only.",
         )
 
     section("Notification & Classification")
     c, d = st.columns(2)
     with c:
+        st.session_state.setdefault("conf_threshold", COMMIT_THRESHOLD_DEFAULT)
+
+        def _threshold_changed():
+            # load_data() is deliberately not cleared — it reparses 78,840 rows.
+            # Nothing it caches depends on the threshold; these four do.
+            for fn in (build_anomaly_view, compute_z_scores,
+                       score_test_set, score_decision_value):
+                fn.clear()
+
         st.slider(
-            "Confidence threshold (auto-classify above)",
-            0.0, 1.0, float(cfg.confidence_threshold), 0.05,
-            help="Below this, the classification is flagged Review Recommended "
-                 "instead of auto-accepted.",
+            "Dispatch threshold (confidence required to send a technician)",
+            0.0, 1.0, step=0.05, key="conf_threshold", on_change=_threshold_changed,
+            help="The agent recommends dispatch only above this confidence. Below "
+                 "it, the classification is flagged Review Recommended instead.",
         )
+        _t = commit_threshold()
+        if abs(_t - BREAK_EVEN) < 0.026:
+            st.caption(
+                f"At {_t:.2f} this matches the break-even implied by your own costs "
+                f"(\\${DISPATCH_COST:.0f} a visit against a \\${MISS_COST:,.0f} miss). "
+                f"Every classification the model produces clears this bar."
+            )
+        else:
+            st.caption(
+                f"Break-even from your cost model is **{BREAK_EVEN:.2f}** — a visit "
+                f"costs \\${DISPATCH_COST:.0f}, a missed fault \\${MISS_COST:,.0f}, so "
+                f"dispatching pays whenever p × \\${MISS_COST:,.0f} > \\${DISPATCH_COST:.0f}. "
+                f"This is set to {_t:.2f}, {_t / BREAK_EVEN:.0f}× higher. "
+                f"Raising the bar above break-even withholds technicians from faults "
+                f"the product identified correctly."
+            )
     with d:
         prefs = ["email", "in_app", "both"]
         st.selectbox(

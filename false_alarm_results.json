@@ -1,0 +1,1002 @@
+{
+ "FA-0348": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The refrigeration load is bouncing up and down across the whole afternoon on a warm day, with several hours at similar or higher levels than the flagged hour. There is no sustained step up and no failure to return to normal, which is what a failing compressor would look like. This reads as normal busy-afternoon cycling rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon refrigeration cycling during peak throughput; note that 18:00 ran higher still with no alert, and set the afternoon baseline for this sub-system to reflect warm-day loads so the same hour is not re-flagged.",
+  "symptom_to_check": "",
+  "latency_seconds": 9.15
+ },
+ "FA-0214": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the afternoon, building gradually and easing as the load settles. This is the cooling system doing more work on a warm day rather than a sign of a fault. The magnitude is well within what the unit can normally draw under these conditions.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-afternoon HVAC cooling load on Unit 2 (temperature-driven) so it is not re-opened in next month's review; consider raising the temperature-adjusted baseline for afternoons above 80F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.57
+ },
+ "FA-0516": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.55,
+  "explanation_text": "The unit drew more power late at night even as it got cooler outside, which is the opposite of what weather-driven cooling demand would do. That pattern usually means the unit is having to work harder than it should to move the same amount of air, most often because airflow is restricted. It eased off on its own, so it is worth watching rather than treating as an emergency right now.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 3 over the next 24 hours, specifically the 22:00-01:00 window; if it again runs roughly 1.5-2x its baseline for two or more hours while outdoor temperature is falling, escalate to an HVAC dispatch and pull the filter service record.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.21
+ },
+ "FA-0449": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The increase is modest and happened at the hottest hour of the midday period, when the site is busiest and cold rooms are opened most often. Consumption returned to normal, and even dipped below normal, within a couple of hours, which is not what a failing refrigeration unit looks like. This reads as ordinary midday activity rather than a developing fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log the Monday midday refrigeration rise as normal peak-throughput and warm-weather loading for Zone A so it is not re-opened next month; only revisit if the elevated draw stops returning to baseline.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.34
+ },
+ "FA-0359": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.68,
+  "explanation_text": "The refrigeration load is rising steadily through the morning in step with the warming outside air and normal weekday activity, and the flagged hour is actually lower than the hour before it. There is no sustained jump or plateau that would suggest a machine struggling. This looks like ordinary daytime workload on a warm day rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-weather daytime refrigeration load for Monday 29 June so the same rising morning profile is not re-flagged; consider widening the baseline for hours above 84F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.52
+ },
+ "FA-0039": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.6,
+  "explanation_text": "Refrigeration in this zone is running well above its normal overnight level and staying there for a couple of hours rather than settling back down. That sustained elevated draw at night, when the building is quiet and outdoor conditions are easing, points to cooling equipment working harder than it should to hold temperature. It is a modest but persistent overdraw, which is typical of a compressor struggling or short-cycling rather than a metering glitch.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A to check compressor run time and suction/discharge pressures, and confirm the zone is holding its setpoint overnight.",
+  "symptom_to_check": "Compressor short-cycling or extended run time with abnormal suction/discharge pressures and elevated head pressure; check for dirty condenser coil, failing contactor, and whether the zone is holding setpoint.",
+  "latency_seconds": 5.82
+ },
+ "FA-0079": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The HVAC load rose steadily through the morning in step with the outdoor temperature climbing into the high 70s, and stayed elevated across several hours rather than jumping suddenly. This is the cooling system working harder on a warm day, which is normal and expected behaviour. Nothing in the pattern suggests a failing part.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-weather cooling load for HVAC Unit 1 on Saturday morning so it is not re-flagged; consider raising the temperature-adjusted baseline for days above roughly 78F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.97
+ },
+ "FA-0014": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-006",
+  "confidence_score": 0.5,
+  "explanation_text": "Refrigeration load jumped by about forty percent for a single hour in the early evening and then settled slightly below its normal level, which is the signature of the cold space being opened or losing seal and the system working hard to pull temperature back down. The outdoor temperature was falling at the time, so weather does not explain it. The size of the jump is well within what this equipment can physically draw, so it is a real load event rather than a meter error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A to inspect door gaskets, closers and alarm history around the 18:00 evening activity window, and confirm no door was left standing open.",
+  "symptom_to_check": "Damaged or compressed door gaskets and misaligned door closers on Zone A causing warm air infiltration, evidenced by extended compressor run time and frost or condensation build-up around the door frame and evaporator coil.",
+  "latency_seconds": 8.11
+ },
+ "FA-0341": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.68,
+  "explanation_text": "The reading sits well within the normal up-and-down swing seen across the whole afternoon, with several neighbouring hours just as high or higher. There is no sustained climb and no failure to settle back down, which is what a genuine equipment problem looks like. This is ordinary busy-period load on the refrigeration plant during a mild afternoon.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal Monday afternoon throughput variation on the compressor bank so the same 16:00 reading is not re-opened next month; no work order required.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.23
+ },
+ "FA-0076": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.5,
+  "explanation_text": "The unit is running noticeably harder than expected for a cool early-morning hour, and the hours either side show the same elevated, fluctuating draw rather than a single isolated event. The extra load is modest and well within what the unit can physically pull, so this is not a metering error, and the mild outdoor temperature rules out weather as the driver. The most likely cause is restricted airflow making the unit work harder than it should.",
+  "recommended_action": "monitor",
+  "next_action": "Track HVAC Unit 1 overnight hours (01:00-06:00) for the next 24 hours; if draw again exceeds roughly 50 kWh/hr at outdoor temperatures below 75F, schedule a filter and airflow inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 7.68
+ },
+ "FA-0534": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-003",
+  "confidence_score": 0.62,
+  "explanation_text": "The unit has been running well above its normal overnight level for four straight hours without settling back down, even though outdoor conditions are mild and stable. A sustained elevated draw at night, when cooling demand should be at its lowest, points to the unit working harder than it should rather than responding to the weather. This pattern is consistent with an air-moving problem forcing the system to run continuously.",
+  "recommended_action": "dispatch",
+  "next_action": "Send an HVAC technician to inspect HVAC Unit 3's supply fan, motor and drive belt, plus filter condition, before the daytime load builds.",
+  "symptom_to_check": "Fan running continuously with reduced airflow across the coil \u2014 check for slipping or worn belt, failing fan motor bearings, motor drawing high amps, loaded filters and low supply-air delta-T causing the unit to run without satisfying setpoint.",
+  "latency_seconds": 6.76
+ },
+ "FA-0239": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "Cooling demand climbed steadily through the middle of the day in step with rising outdoor temperature, and the flagged hour sits at the top of that natural climb rather than standing apart from it. Usage eased back afterwards and stayed within the same range, which is what a healthy system does when it keeps pace with the weather. There is no sign of a stuck or runaway unit.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon cooling load on HVAC Unit 2 for Monday 25 May so it is not re-flagged; consider widening the temperature-adjusted baseline for afternoons above 75F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.95
+ },
+ "FA-0453": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The rise in HVAC use tracked the warmest part of a mild spring day and fell away as soon as the outdoor temperature eased. The increase was modest and short-lived, with the unit returning to its normal level straight afterwards, which is what cooling equipment is supposed to do. There is no sign of the sustained or climbing draw that would point to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as midday weather-driven cooling load on HVAC Unit 3 for 14 April so it is not re-flagged; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.86
+ },
+ "FA-0257": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The extra electricity use on the air conditioning unit rose and fell alongside the outdoor temperature climbing through midday, and it settled back down on its own afterwards. The size of the increase is well within what this unit can normally draw when working harder on a warm afternoon. This looks like the system responding to the weather rather than a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected midday warm-weather cooling load on HVAC Unit 2 for Saturday 6 June so it is not re-opened in next month's review; no technician needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.81
+ },
+ "FA-0408": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-006",
+  "confidence_score": 0.52,
+  "explanation_text": "Refrigeration use jumped for a single hour late in the evening while outdoor temperatures were falling, so the extra cooling work cannot be explained by the weather or by shift activity. A short burst of extra load that settles back on its own usually means the cold space lost seal integrity briefly and the units had to pull the temperature back down. The size of the increase is well within what this equipment can physically draw, so it is a real load event rather than a meter error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect the Zone A door gaskets, closures and strip curtains, and pull the door-open and defrost logs for the 21:00 hour on Tuesday 26 May.",
+  "symptom_to_check": "Check for damaged or compressed door gaskets and misaligned door closers on Zone A; look for frost or ice build-up around the door frame and evaporator coil, and confirm whether the unit ran an extended pull-down or off-cycle defrost recovery after a door-open event.",
+  "latency_seconds": 10.28
+ },
+ "FA-0508": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.53,
+  "explanation_text": "The unit's draw climbed steadily through the late morning and then held at an elevated level for about three hours before falling back, even though the outside temperature was still rising at the point it dropped. That pattern of extra effort that is not matched by the weather usually means the unit is working harder than it should to move air, most often because airflow is restricted. It is a moderate, recoverable increase rather than a sudden breakdown, so it warrants watching before sending anyone out.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 3 over the next 24 hours for a repeat of the late-morning climb into a sustained 60+ kWh/hr plateau between roughly 10:00 and 13:00; if it recurs at similar or higher load, raise a filter and airflow inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 9.49
+ },
+ "FA-0401": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.66,
+  "explanation_text": "The refrigeration load was running high across the whole afternoon, not just in the flagged hour, and the flagged hour is actually lower than the hour before it. This is the pattern of a warm-day afternoon with normal activity, where the cooling equipment works harder and cycles more often. There is no sustained step-change or runaway climb that would point to failing equipment.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon refrigeration load for Zone A on Saturday 16 May so it is not re-opened; consider raising the baseline for this hour when outdoor temperature exceeds 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.1
+ },
+ "FA-0333": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.86,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the middle of the day, and it eases back as the afternoon heat levels off. This is the cooling system working harder to hold indoor conditions, which is exactly what it should do. There is no sign of a stuck or failing unit, since the load returns toward normal rather than staying high.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected midday weather-driven cooling load on HVAC Unit 2 for the 27 July warm spell so it is not re-opened in next month's review.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.66
+ },
+ "FA-0420": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.66,
+  "explanation_text": "The refrigeration zone has been drawing well above its normal level for most of the working day without ever settling back down, and this is already after allowing for how hot it is outside. A cooling system that keeps running hard for nine straight hours is usually struggling to hold temperature rather than simply responding to the weather. That points to a mechanical problem in the cooling plant that will get worse and risk the stored product if left.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A today to inspect the lead compressor and check suction/discharge pressures and run-time against the temperature-adjusted expectation.",
+  "symptom_to_check": "Compressor running continuously with little or no cycling, high discharge pressure or elevated superheat, and zone temperature not pulling down to setpoint; also check for short-cycling, dirty condenser coils and refrigerant charge.",
+  "latency_seconds": 7.63
+ },
+ "FA-0130": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.62,
+  "explanation_text": "HVAC consumption has been climbing steadily through the evening and overnight even though outdoor temperature is flat and slightly falling, and it never returns to its normal level. That combination points to the unit having to work harder to move the same air, which is typically restricted airflow from a dirty or blocked filter rather than a weather-driven demand.",
+  "recommended_action": "monitor",
+  "next_action": "Track HVAC Unit 1 over the next 24 hours, particularly the 22:00-02:00 window; if overnight draw again sits 40-60% above baseline at similar mild temperatures, raise a filter and airflow inspection work order.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.8
+ },
+ "FA-0012": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-006",
+  "confidence_score": 0.55,
+  "explanation_text": "The refrigeration zone drew noticeably more power for a single afternoon hour and then settled straight back to its normal level, with no gradual climb before or lingering load after. That short burst of extra cooling effort is the signature of warm air entering the space, typically a door left open or a seal no longer closing properly. The size of the increase is well within what this equipment can actually draw, so it is a real plant event rather than a meter error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect the Zone A door gaskets and closers, starting with the main access door used during afternoon picking.",
+  "symptom_to_check": "Check door gaskets and closers on Zone A for compression loss, gaps or ice build-up at the seal line, and verify the door switch and any air curtain; look for suction pressure rise and extended compressor run time coinciding with door-open events.",
+  "latency_seconds": 7.48
+ },
+ "FA-0375": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The flagged hour is actually lower than several of the hours around it, so nothing unusual happened at that moment \u2014 the refrigeration plant was simply working hard all evening in warm outdoor conditions. The rise is modest and the load returns to the same elevated band before and after, which is what normal heavy-duty running looks like rather than a failing compressor. There is no sustained step change or runaway climb that would point to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as elevated evening refrigeration load during warm weather on 2 July so it is not re-opened; no dispatch needed unless the compressor bank holds above roughly 1.8x baseline for three or more consecutive hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.64
+ },
+ "FA-0197": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.52,
+  "explanation_text": "The refrigeration zone stayed well above its normal level for around five hours in the late afternoon and early evening, without settling back down as it usually would once the busiest period passes. A steady, prolonged overdraw like this on a cold-storage system usually means the cooling equipment is running much harder or longer than it should to hold temperature. Warm weather explains some extra load, but not a sustained elevation of this shape on refrigeration alone.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone B to check compressor run time and cycling behaviour, starting with suction/discharge pressures and head pressure on the lead compressor.",
+  "symptom_to_check": "Compressor short-cycling or running continuously without reaching setpoint; check suction and discharge pressures, superheat, condenser coil cleanliness and condenser fan operation, and confirm space temperature is being held.",
+  "latency_seconds": 9.64
+ },
+ "FA-0270": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.84,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the morning almost step for step, and levels off as the day heats up rather than jumping suddenly. This is the cooling system working harder on a hot day, which is exactly what it is designed to do. There is no sign of a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-weather HVAC load event on Unit 2 for 10 June so it is not re-flagged; consider raising the temperature-adjusted baseline for days above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.35
+ },
+ "FA-0409": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.6,
+  "explanation_text": "The refrigeration zone drew about a third more power for a single midday hour and then returned to its normal range straight away. A brief lift of this size at the busiest part of the day is consistent with heavier door activity and product movement during peak picking, not with a failing compressor, which would keep running high. Nothing in the surrounding hours suggests the unit is struggling.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal midday peak-throughput load on Refrigeration Zone A for Wednesday 3 June so it is not re-opened; no action needed unless the 13:00 lift repeats on consecutive days or fails to fall back.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.59
+ },
+ "FA-0139": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.66,
+  "explanation_text": "The flagged hour sits right in line with the hours before and after it, all of which are running at a similar level as the unit holds the building against a mild, steady overnight temperature. Nothing steps up and stays up, and nothing climbs the way a failing unit would. This looks like ordinary cooling load rather than a developing problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal overnight HVAC Unit 1 cooling load on a mild July night and recalibrate the 05:00 baseline for this temperature band so the same routine hour is not re-flagged.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.65
+ },
+ "FA-0280": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.5,
+  "explanation_text": "Late in the evening, as outdoor conditions were cooling, this air handling unit drew noticeably more power than it should have for a single hour before settling back down. Cooler air should mean less work, so the extra effort points to the unit straining against restricted airflow rather than responding to the weather. It is a modest, short-lived rise, so it is worth watching rather than treating as an emergency.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 2 over the next 24 hours for another evening hour (roughly 21:00-23:00) exceeding about 55 kWh while outdoor temperature is falling; if it repeats, schedule a filter and airflow inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.46
+ },
+ "FA-0459": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.76,
+  "explanation_text": "The rise in HVAC use lines up closely with a sharp jump in outdoor temperature during the early hours, and the load falls back when the temperature dips before climbing again as it warms. This is the cooling system responding to conditions as designed rather than a mechanical problem. The increase is modest and well within what this unit can normally draw.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a weather-driven overnight cooling response tied to the ~21F temperature rise between 23:00 and 00:00 so it is not re-opened in next month's review; no work order needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.46
+ },
+ "FA-0352": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The refrigeration load rose modestly during the busiest late-morning hours and tracked closely with rising outdoor temperature, staying elevated across several hours rather than jumping and locking in at a fixed high level. This is the pattern of a plant working harder during peak activity on a warm day, not of failing equipment. There is no sign of a runaway or continuously climbing draw.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-day peak-throughput refrigeration load for Monday mid-morning so it is not re-flagged; no visit needed unless the compressor bank stays above roughly 85 kWh/hr into the cooler evening hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.54
+ },
+ "FA-0525": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The rise in HVAC use tracks the morning warm-up almost exactly, climbing hour by hour as the outside air heats up and staying elevated as the day gets hotter. This is the cooling system doing its job under increasing heat load rather than a piece of equipment misbehaving. Nothing in the pattern suggests a stuck or failing component.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-morning cooling ramp on HVAC Unit 3 so the same weather-driven rise is not re-flagged; only revisit if consumption stays high after outdoor temperatures fall in the evening.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.16
+ },
+ "FA-0295": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The extra electricity use on this air conditioning unit rose and fell in step with the outdoor temperature through a hot afternoon, which is exactly what cooling equipment is expected to do. The increase is modest and the unit relaxed again when conditions eased, showing it is still able to keep up rather than running away. Nothing here points to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected hot-afternoon cooling load for HVAC Unit 2 on 6 July (mid-80sF) so the same weather-driven afternoon rise is not re-flagged next month; consider raising the summer baseline for this unit at temperatures above 82F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.67
+ },
+ "FA-0057": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.68,
+  "explanation_text": "The higher load tracks the warmest part of a mild spring afternoon and settles back down as the temperature eases, which is exactly what cooling equipment is expected to do. The rise is modest, gradual and self-correcting rather than a sudden jump that stays high. There is no sign of the unit struggling or running continuously after conditions improved.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal afternoon weather-driven cooling load on HVAC Unit 1 for 23 April so it is not re-flagged; no service call needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.55
+ },
+ "FA-0240": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.7,
+  "explanation_text": "The higher usage on this air-conditioning unit lines up with a warm afternoon and sits in line with the surrounding hours, which were all running at a similar level. The unit came back down afterwards rather than staying stuck high, which is what you would expect from cooling demand rather than a failing part. This looks like normal warm-weather cooling load.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-afternoon cooling load on HVAC Unit 2 for 25 May so it is not re-flagged; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.01
+ },
+ "FA-0119": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The rise is modest and sits right in line with the surrounding hours, which are all running at a similar level as the morning warms up. This looks like normal cooling load picking up as the building heats, not a piece of equipment misbehaving. Nothing here suggests a stuck or failing unit.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal morning warm-up cooling load on HVAC Unit 1 for 16 July so the same hour is not re-flagged; no site visit needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.08
+ },
+ "FA-0474": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The higher usage on this unit tracks the warm outdoor conditions through the late morning, with neighbouring hours running at a similar elevated level rather than one isolated jump. The cooling system is simply working harder to hold temperature on a warm day, and it eases back as conditions do. There is no sign of a stuck or failing component.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-weather cooling load on HVAC Unit 3 for the 6 June late-morning period so it is not re-opened in next month's review; no dispatch needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.24
+ },
+ "FA-0535": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.83,
+  "explanation_text": "The rise in energy use tracks the outdoor temperature climbing through the morning, and consumption keeps stepping up hour by hour in line with the heat rather than jumping and staying flat. This is the cooling system working harder as the day warms, which is exactly what it is designed to do. There is no sign of a stuck or failing component.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-morning HVAC ramp on Unit 3 for 30 July so it is not re-flagged; consider adding a temperature-adjusted baseline for hours above 75F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.77
+ },
+ "FA-0165": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.58,
+  "explanation_text": "Overnight refrigeration use on this zone has been running well above its normal level for several hours rather than briefly jumping and settling back. That sustained elevated draw during a quiet period, when there is no activity to explain it, usually means the cooling equipment is working harder than it should to hold temperature. The size of the increase is well within what the plant can physically draw, so this is a real load, not a metering error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone B to check compressor run time and cycling behaviour overnight, starting with suction/discharge pressures and head pressure at the lead compressor.",
+  "symptom_to_check": "Extended or continuous compressor run time overnight with poor pull-down; check suction and discharge pressures, superheat, condenser fouling and whether short-cycling or a failing unloader is driving elevated power draw.",
+  "latency_seconds": 7.69
+ },
+ "FA-0321": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The rise in usage tracks the afternoon temperature climb on a hot day, and it settles back down as the air cools in the evening. Earlier hours that day were hotter and drew even more power, so this level of cooling demand is normal for the conditions. Nothing here points to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-afternoon cooling load on HVAC Unit 2 for Friday 17 July so the same temperature-linked rise is not re-opened next month.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.13
+ },
+ "FA-0368": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.66,
+  "explanation_text": "The flagged hour is actually one of the quieter hours of the afternoon \u2014 the hours before and after it drew more power than the hour that triggered the alert. On a very warm day the refrigeration plant cycles harder to hold temperature, and the readings move up and down with that cycling rather than climbing and staying high. There is no sign of a machine stuck on or degrading.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-weather refrigeration cycling during a busy Wednesday afternoon so the 17:00 compressor bank reading is not re-opened; consider raising the hot-day baseline for the compressor bank above 90F.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.56
+ },
+ "FA-0347": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.6,
+  "explanation_text": "For one hour the refrigeration compressors drew about a third more power than normal, then settled back down even though the outside air was cooling rather than warming. Nothing about the business day or the weather explains that jump, and a short burst of extra compressor work usually means the units had to fight to hold temperature. The size of the increase is well within what the plant can physically draw, so this is a real load event rather than a meter glitch.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect the compressor bank, starting with head pressure and cycling behaviour on the units that ran at 18:00 Thursday.",
+  "symptom_to_check": "Compressor short-cycling or extended run time with elevated head pressure and suction superheat; check for a unit struggling to pull down box temperature, and inspect condenser coils and door seals on the served cases.",
+  "latency_seconds": 7.48
+ },
+ "FA-0155": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.66,
+  "explanation_text": "The rise is modest and sits inside a broad afternoon block where consumption was already elevated and tracking the warmest part of the day. It climbs and falls smoothly with surrounding hours rather than jumping and staying up, which is what a failing compressor or seal would look like. This reads as normal busy-period refrigeration load on a warm Tuesday afternoon.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon peak load on Refrigeration Zone B so the same 14:00 pattern is not re-opened next month; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.62
+ },
+ "FA-0083": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.62,
+  "explanation_text": "The reading sits within the normal range of the surrounding evening hours, which are all running at a similar elevated level rather than showing a single isolated jump. This looks like the cooling system working steadily through a mild evening, not a component failing. Nothing about the pattern suggests a breakdown that needs a visit.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal evening HVAC cooling load on Unit 1 for 8 June so the same hour is not re-flagged; consider widening the evening baseline band for this unit.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.46
+ },
+ "FA-0118": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.55,
+  "explanation_text": "The unit was running noticeably harder than normal through the early morning hours even though it was mild outside, and it never settled back to its usual level between hours. That pattern points to the unit having to work harder to move air rather than to genuine cooling demand, which is typically caused by restricted airflow such as clogged filters. It is not urgent yet, but it will get worse and waste energy if left alone.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 1 over the next 24 hours, specifically the 01:00-06:00 overnight window; if consumption again holds at roughly 1.5-2x the 36 kWh/hr baseline for two or more consecutive hours at mild outdoor temperatures, raise a work order for a filter and airflow inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 9.57
+ },
+ "FA-0216": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The extra electricity use on this air conditioning unit rose and fell in step with the outdoor temperature through the warmest part of a mild spring afternoon, and it dropped away as soon as it cooled off. That is the cooling system doing its job on a warmer day, not a machine in trouble. The doubling relative to baseline is well within what this unit can physically draw.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-afternoon cooling load on HVAC Unit 2 for 31 March so it is not re-flagged; if similar elevated use appears on cool days below about 65F, escalate for inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.55
+ },
+ "FA-0202": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.58,
+  "explanation_text": "The extra load on the chillers appeared during the hottest part of a hot afternoon and settled back to normal on its own within the hour, with a similar smaller bump earlier in the day. A genuine equipment problem would keep the load elevated rather than letting it fall away as the afternoon cooled. This looks like normal busy-afternoon cooling demand rather than a failure.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon refrigeration demand on Zone B for 16 July so it is not re-opened; no work order needed. If Zone B stays above roughly 110 kWh/hr for three or more consecutive hours into the cooler evening, escalate as a possible compressor or door-seal issue.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.77
+ },
+ "FA-0007": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.58,
+  "explanation_text": "The cold-store drew moderately more power for a single afternoon hour and then went straight back to its normal level, with no lingering elevation afterwards. A failing compressor or a bad door seal would keep the load high hour after hour rather than settling immediately. The size and timing fit a busy mid-afternoon period of stock movement and door openings on a Friday.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal Friday afternoon throughput on Refrigeration Zone A and check the 14:00 dock/pick schedule to confirm a loading push; no investigation needed unless the elevated hour repeats on consecutive days.",
+  "symptom_to_check": "",
+  "latency_seconds": 10.38
+ },
+ "FA-0412": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-006",
+  "confidence_score": 0.52,
+  "explanation_text": "Refrigeration Zone A drew noticeably more power for a single midday hour on a warm day, then settled straight back to its normal level. That short, sharp burst of extra cooling effort is typical of warm air getting into the cold space, most often through a door or seal left compromised during busy midday activity, rather than a failing compressor which would keep the load elevated. It is modest in size and physically credible, so it is a real plant event worth a quick look rather than a meter error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect Zone A's door seals, curtains and closers, focusing on the main loading door used around midday Thursday.",
+  "symptom_to_check": "Check for warm air infiltration at Zone A: damaged or compressed door gaskets, misaligned or slow-closing doors, frost or condensation build-up around the door frame and evaporator, and extended compressor run time following door openings.",
+  "latency_seconds": 9.4
+ },
+ "FA-0002": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.55,
+  "explanation_text": "The reading sits only modestly above normal and the hours either side are just as high, so nothing stands out as a distinct event. The whole afternoon is running warm and the refrigeration load is simply working harder in the heat, with the reading falling back on its own rather than holding at a new level. This looks like normal warm-afternoon operation rather than a failing unit.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as routine warm-afternoon refrigeration load on Zone A for 17 May so it is not re-opened; no dispatch needed. If afternoon readings on Zone A stay above 70 kWh/hr once outdoor temperatures drop back below 80F, re-examine.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.24
+ },
+ "FA-0234": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.52,
+  "explanation_text": "This unit drew about two and a half times its expected load for a single hour and then settled back, even though the outdoor temperature stayed flat before, during and after. That rules out weather as the driver, and the amount of extra power is well within what the unit could physically pull, so it is not a meter glitch. The most likely cause is the unit briefly having to work much harder than normal against restricted airflow, which typically comes from dirty or blocked filters and tends to worsen if left alone.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 2 over the next 24 hours, particularly the late-afternoon hours around 17:00, and treat any repeat of a one-hour draw near 45-50 kWh at steady outdoor temperature as confirmation to schedule a filter and airflow inspection.",
+  "symptom_to_check": "",
+  "latency_seconds": 9.98
+ },
+ "FA-0029": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.66,
+  "explanation_text": "The extra load is modest and rises and falls in step with the hot afternoon and normal midday activity, rather than locking in at a higher level the way failing equipment does. Surrounding hours show similar or higher use, so this hour is not an outlier for the day. This looks like the refrigeration plant working harder during the busiest, warmest part of a summer weekday.",
+  "recommended_action": "dismiss",
+  "next_action": "Log Thursday midday as a hot-weather peak-throughput period for Refrigeration Zone A so the same summer midday pattern is not re-opened next month; no work order needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.57
+ },
+ "FA-0253": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The extra load on the air conditioning built up through the middle of a warm afternoon and tracked closely with the rising outdoor temperature, then eased as conditions levelled off. This is the cooling system working harder to hold indoor conditions, which is what it is designed to do on a warm day. There is no sign of a stuck, flat-out draw that would point to failed equipment.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-afternoon cooling load for HVAC Unit 2 on 3 June so it is not re-flagged in the monthly review; only revisit if similar load appears on a cool day.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.07
+ },
+ "FA-0231": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The extra electricity use rises and falls in step with the outdoor temperature climbing through the afternoon, which is exactly what cooling equipment is meant to do on a warm day. The load stays within a range the unit can normally draw and there is no sign of it running away or failing to respond. This looks like normal weather-driven cooling demand rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-afternoon HVAC cooling response on Unit 2 (temperature-correlated load) so the same Thursday afternoon pattern is not re-opened next month; consider adding a temperature-adjusted baseline for HVAC Unit 2.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.2
+ },
+ "FA-0107": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The higher usage on this cooling unit tracks closely with the warm afternoon outdoor conditions, and neighbouring hours show the same elevated pattern rising and falling with temperature. There is no sustained climb or plateau that would suggest a failing part. This is the cooling system working harder on a hot afternoon, which is expected.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon cooling load for HVAC Unit 1 on 2026-07-09 so it is not re-flagged, and consider raising the summer afternoon baseline for this unit above 84F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.29
+ },
+ "FA-0418": {
+  "top_level_class": "data_anomaly",
+  "classification_type_id": "CT-013",
+  "confidence_score": 0.52,
+  "explanation_text": "The reading flagged here is actually lower than the hours immediately before and after it, so nothing unusual is happening on the chiller itself. The zone is simply working a little harder than the model expects because the evening stayed warm, and the small one-hour bump sits well inside normal measurement scatter. There is no sign of a sustained climb or a plateau that would point to failing equipment.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-evening refrigeration scatter on Zone A for 29 June and adjust the night-hour baseline for high ambient temperatures so the same 22:00 reading is not re-flagged next month.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.74
+ },
+ "FA-0350": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.66,
+  "explanation_text": "The rise is modest and sits inside a warm Friday afternoon where consumption climbs and falls smoothly with the outdoor temperature and the busy end of day shift. There is no sustained step up and no failure to return toward normal levels afterwards, which is what a failing compressor would look like. This reads as ordinary refrigeration load during the hottest, busiest part of the day.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal Friday afternoon peak-throughput refrigeration load on a warm day so it is not re-opened in next month's review; no dispatch needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.9
+ },
+ "FA-0361": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.46,
+  "explanation_text": "Refrigeration draw in the evening is swinging up and down between hours even though the outside temperature is steadily falling, which is the opposite of what a cooling load should do. That erratic up-down pattern is typical of a compressor short-cycling or struggling to hold set point rather than a simple busy period. The size of the increase is well within what the bank can physically draw, so it is a plant behaviour, not a metering error.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to the compressor bank to check run/cycle logs and head pressure for the 20:00-23:00 window on 29 June.",
+  "symptom_to_check": "Short-cycling compressor: frequent start/stop, high discharge/head pressure or suction pressure not pulling down, check condenser fan operation and coil cleanliness.",
+  "latency_seconds": 13.25
+ },
+ "FA-0475": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The higher reading sits in the middle of a warm afternoon when cooling demand was already elevated, and the surrounding hours show a similar level of load that tapers off as the outside air cools. Nothing here looks like a failure: the unit did not stay stuck at a high draw or climb steadily, it simply worked harder at the warmest point of the day. This is expected cooling behaviour rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon cooling load on HVAC Unit 3 and adjust the temperature-adjusted baseline for 80F+ Saturday afternoons so the same pattern is not flagged again.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.22
+ },
+ "FA-0326": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.55,
+  "explanation_text": "The unit drew noticeably more power for a single hour late in the evening even though it was cooling off outside, then settled back down. Rising demand while conditions are easing usually means the unit is working harder than it should to move air, which points to a restricted or dirty filter rather than weather. It is a single short episode, so it is worth watching before sending anyone out.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 2 over the next 24 hours, especially the 21:00-23:00 window; a repeat of roughly 1.5x or higher above baseline while outdoor temperature is falling would confirm airflow restriction and justify a filter change and technician visit.",
+  "symptom_to_check": "",
+  "latency_seconds": 7.07
+ },
+ "FA-0482": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-003",
+  "confidence_score": 0.62,
+  "explanation_text": "The unit's power draw jumped in the evening and then stayed high for several hours instead of settling back down, even though it was getting cooler outside. When cooling demand is falling but the unit keeps drawing more power, it usually means the air-moving side is struggling and the unit is working harder to shift the same air. This is a mechanical problem rather than normal evening operation.",
+  "recommended_action": "dispatch",
+  "next_action": "Send an HVAC technician to inspect HVAC Unit 3's supply fan and motor, starting with fan bearings, belt tension and motor amp draw against nameplate.",
+  "symptom_to_check": "Elevated fan motor amp draw with reduced airflow across the coil; check for worn or seized fan bearings, slipping or shredded belt, unbalanced blower wheel, and confirm static pressure across the filter bank and coil.",
+  "latency_seconds": 9.16
+ },
+ "FA-0493": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.76,
+  "explanation_text": "The extra load on this air conditioning unit rose and stayed elevated through a very hot day, tracking the outdoor temperature closely rather than jumping suddenly and staying flat. That is the cooling system working harder to hold indoor conditions in extreme heat, which is expected behaviour. There is no sign of a mechanical failure in the pattern.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a hot-weather cooling surge on HVAC Unit 3 for 1 July (98F peak day) so it is not re-opened in next month's review; only revisit if similar elevated draw appears on a mild day.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.63
+ },
+ "FA-0059": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The extra load builds and falls in step with the rising afternoon outdoor temperature, peaking in the warmest part of the day and easing as it cools. The size of the increase is modest and well within what the cooling system can normally draw. This is the system working harder to hold temperature on a warm afternoon, not a malfunction.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon cooling load for HVAC Unit 1 on 4 May so it is not re-flagged; consider widening the temperature-adjusted baseline for afternoons above 75F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.27
+ },
+ "FA-0436": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.56,
+  "explanation_text": "Refrigeration in this zone has been running noticeably above its normal level for several hours in a row rather than briefly peaking and settling back. The size of the increase is well within what the equipment can physically draw, so this is real consumption, not a metering error, and hot weather alone does not explain a refrigeration circuit holding elevated load this long. The most likely cause is cooling equipment working harder than it should to hold temperature.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A to inspect the lead compressor and its head pressure/run-time behaviour before the next warm afternoon.",
+  "symptom_to_check": "Compressor short-cycling or extended run time with elevated discharge pressure and suction superheat; check condenser coil cleanliness, condenser fan operation, and whether the zone is holding setpoint.",
+  "latency_seconds": 8.84
+ },
+ "FA-0470": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.85,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the morning, stepping up hour by hour rather than jumping suddenly. This is the cooling system working harder on a warm day, which is exactly what it is designed to do. There is no sign of a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-weather cooling load on HVAC Unit 3 for 4 June so it is not re-flagged, and consider raising the summer baseline for this unit above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.48
+ },
+ "FA-0376": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.62,
+  "explanation_text": "The refrigeration compressors stepped up to a noticeably higher draw and stayed there for three hours instead of settling back, and this is above what the warm weather alone would normally require. A unit that keeps working harder than expected without recovering usually means it is struggling to hold temperature. It is worth an inspection now, before it turns into a failure during the hottest part of the summer.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to the compressor bank today to check head pressure, suction temperature and cycling behaviour on each compressor, starting with the lead unit.",
+  "symptom_to_check": "Compressor running extended or continuous cycles with elevated head pressure and poor suction superheat \u2014 check for high discharge temperature, dirty or restricted condenser coils, and whether the unit is holding setpoint.",
+  "latency_seconds": 8.29
+ },
+ "FA-0023": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-006",
+  "confidence_score": 0.46,
+  "explanation_text": "The refrigeration zone drew about a third more power than normal for a single hour late in the evening, then settled straight back to its usual level. That short burst of extra cooling on a warm night is the signature of warm air getting into the cold space \"a door or seal left open, or a brief loss of insulation \" rather than a metering error, since the amount of power involved is well within what this equipment can actually draw. It is worth a quick check because a failing seal will keep repeating and slowly damage the compressor.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect Zone A's door seals, gaskets and door-closer alignment, and review the 22:00 door-open log for that zone.",
+  "symptom_to_check": "Check for damaged or compressed door gaskets, misaligned or slow-closing doors, frost or ice build-up around the door frame and evaporator, and extended compressor run time or short-cycling following a warm-air ingress event.",
+  "latency_seconds": 10.18
+ },
+ "FA-0168": {
+  "top_level_class": "data_anomaly",
+  "classification_type_id": "CT-013",
+  "confidence_score": 0.55,
+  "explanation_text": "The rise is small and sits well within the normal hour-to-hour swing already seen either side of it, including a higher reading in the following hour that then falls away. There is no sustained step up in demand that would point to a cooling unit struggling or running continuously. This looks like ordinary measurement scatter rather than a change in how the equipment is behaving.",
+  "recommended_action": "dismiss",
+  "next_action": "Log the 22:00 Thursday Refrigeration Zone B reading as normal overnight variation within meter scatter so it is not re-opened in the monthly review; no site visit needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 7.51
+ },
+ "FA-0054": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the middle of the day, stepping up hour by hour as it gets warmer and easing slightly as cooling catches up. This is the cooling system doing exactly what it should on a warm afternoon rather than a sign of a failing unit. Nothing in the pattern suggests a stuck or degraded component.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected warm-afternoon cooling load on HVAC Unit 1 for 14 April so it is not re-flagged, and consider widening the temperature-adjusted baseline for spring afternoons above 75F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.83
+ },
+ "FA-0496": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.56,
+  "explanation_text": "Outdoor conditions cooled significantly in the evening, yet this air handling unit's draw did not fall back with them and instead crept steadily upward hour after hour. That pattern of the unit working harder than the weather calls for usually means restricted airflow, such as clogged filters or blocked coils, forcing the system to run longer to hit setpoint. It is not urgent tonight, but it will get worse and waste energy until the airflow is restored.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 3 over the next 24 hours, especially the 19:00-23:00 window when outdoor temperature falls below ~80F; if hourly draw again stays at or above roughly 50 kWh (2x baseline) while temperatures drop, raise a filter and coil service job.",
+  "symptom_to_check": "",
+  "latency_seconds": 10.87
+ },
+ "FA-0262": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.76,
+  "explanation_text": "The elevated reading sits in the middle of a warm evening where cooling load was already high in the hours before and after, and it tapers gently as the outdoor air cools. Nothing steps up sharply or stays stuck at a new level, which is what a failing unit would look like. This is the cooling system working harder because of the weather, which is expected.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as warm-evening cooling load on HVAC Unit 2 for Sunday 7 June so the same evening ramp is not re-opened next month; no site visit needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.62
+ },
+ "FA-0381": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.58,
+  "explanation_text": "The refrigeration compressors stayed noticeably above their normal night-time draw for several hours even as the outside air cooled down, which is the opposite of what should happen. Load that does not fall back overnight usually means the cooling system is working harder than it needs to, such as a compressor short-cycling or struggling to hold temperature. This is worth a physical check rather than waiting.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect the compressor bank, starting with run-time and cycling behaviour on each compressor overnight and the suction/discharge pressures.",
+  "symptom_to_check": "Compressor short-cycling or extended run time with elevated head pressure and poor pull-down on box temperature during cool ambient conditions.",
+  "latency_seconds": 7.81
+ },
+ "FA-0117": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The rise on the air conditioning system builds gradually through the morning in step with the outdoor temperature climbing into the upper 80s, and it stays elevated through the warm part of the day rather than jumping abruptly and staying flat. That is the cooling system doing its job on a hot day, not a component failing. Nothing in the pattern points to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log 15 July as a hot-weather HVAC day for Unit 1 so this elevated daytime profile is not re-flagged; add a temperature-adjusted baseline for days above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.37
+ },
+ "FA-0291": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.85,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through a hot summer morning, increasing steadily hour by hour rather than jumping suddenly. This is the cooling system working harder to hold indoor conditions on a hot day, which is expected behaviour. There is no sign of a mechanical problem such as a unit stuck at full load regardless of conditions.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected hot-weather HVAC load for the 1 July heat event on HVAC Unit 2 so it is not re-flagged; consider raising the summer baseline for days above 90F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.23
+ },
+ "FA-0445": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.56,
+  "explanation_text": "The refrigeration load rose moderately for a couple of hours during the busiest part of the afternoon shift and then settled back to its normal level on its own, and a similar short rise appeared earlier in the same afternoon. A genuine equipment problem would normally hold the higher load rather than drop back twice. This pattern is consistent with heavy dock and picking activity keeping cold-room doors open more often on a hot day.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected Friday afternoon peak-throughput load on Refrigeration Zone A so it is not re-opened next month; if the same 1.4x rise appears outside shipping hours or fails to return to baseline within two hours, escalate to a refrigeration call-out.",
+  "symptom_to_check": "",
+  "latency_seconds": 9.58
+ },
+ "FA-0133": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.62,
+  "explanation_text": "The extra load appeared during the hottest part of a warm weekday afternoon and then eased back down over the following hours as cooling demand settled. The size of the increase is well within what this unit can physically draw, and it did not stay elevated the way a failing component would. This looks like the cooling system working harder against midday heat rather than a breakdown.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a midday heat-driven cooling peak on HVAC Unit 1 for 21 July so it is not re-opened; only revisit if the elevated draw persists into cooler evening hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.14
+ },
+ "FA-0370": {
+  "top_level_class": "data_anomaly",
+  "classification_type_id": "CT-013",
+  "confidence_score": 0.6,
+  "explanation_text": "The flagged reading is actually lower than several of the hours immediately before and after it, so the refrigeration load was not unusually high at that moment. It only looks like a spike because the expected value for that hour and temperature was set too low. There is no sign of a compressor running away or failing to cycle off.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a baseline/threshold artefact on the compressor bank for the 23:00 hour on warm nights so it is not re-opened; consider recalibrating the overnight expected-load curve for temperatures near 80F.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.96
+ },
+ "FA-0406": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.6,
+  "explanation_text": "The rise was modest, lasted a single hour at the start of the working day, and consumption came straight back down afterwards. Refrigeration load through the rest of the morning drifts up gently in line with the warming outside air, which is normal. This looks like a burst of morning activity \u2014 stock movement and door openings at shift start \u2014 rather than a failing unit, which would have held a raised load rather than dropping back.",
+  "recommended_action": "dismiss",
+  "next_action": "Log the 09:00 Tuesday reading on Refrigeration Zone A as shift-start loading activity so it is not re-opened next month; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.84
+ },
+ "FA-0044": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.58,
+  "explanation_text": "Refrigeration draw rose above what this zone normally uses even after allowing for the hot weather, and it stayed elevated for three hours rather than settling back. That pattern usually means the cooling equipment is running much harder than it should to hold temperature. It is worth a look now, before the afternoon heat makes any underlying problem worse.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A today to check compressor run time, suction and discharge pressures, and condenser coil cleanliness before the afternoon peak.",
+  "symptom_to_check": "Compressor short-cycling or continuous run with poor pull-down; check head pressure, superheat/subcooling, and condenser fouling or airflow restriction on Zone A.",
+  "latency_seconds": 8.26
+ },
+ "FA-0489": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.85,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through a hot morning, growing steadily hour by hour rather than jumping abruptly. This is the cooling system working harder to hold temperature on a hot day, which is expected behaviour. There is no sign of a sudden failure or an implausible reading.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as weather-driven cooling load for the 90F Monday so it is not re-flagged; consider raising the HVAC baseline threshold for days above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.72
+ },
+ "FA-0098": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The extra electricity use rises steadily in step with the outdoor temperature climbing through a hot summer morning, which is exactly how cooling equipment behaves when it has to work harder. There is no sudden jump or flat plateau that would suggest something broke. This is the system doing its job on a hot day, not a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected hot-weather cooling load for the 3 July heat event so it is not re-opened in the monthly review; consider adding a temperature-adjusted baseline for HVAC Unit 1 on days above 90F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.95
+ },
+ "FA-0038": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.58,
+  "explanation_text": "The reading sits only slightly above its expected level and is well within the normal up-and-down swing seen across the whole evening, where several neighbouring hours ran considerably higher without being flagged. There is no sustained climb or plateau that would point to failing equipment, and the warm evening keeps the cooling load naturally elevated. This looks like ordinary variation in refrigeration duty rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal evening refrigeration cycling on Zone A during warm weather so it is not re-opened; no action needed unless Zone A holds above roughly 1.5x baseline for three or more consecutive hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.26
+ },
+ "FA-0308": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "Consumption on this air conditioning unit is climbing steadily in step with the rising outdoor temperature through the morning, and continues to rise afterwards rather than jumping and staying flat. This is the expected response of cooling equipment to a warming day, not a sign of a failing part. Nothing in the pattern suggests a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal weather-driven cooling load on HVAC Unit 2 for the warm Friday morning so the same temperature-tracking ramp is not re-flagged next month; consider widening the temperature-adjusted baseline for mid-morning hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.02
+ },
+ "FA-0468": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The extra load rose and fell in step with the warmest part of a mild afternoon, peaking at the hottest hour and easing back as the outside temperature dropped. The increase is modest and the unit returned to its normal level on its own, which is what cooling equipment is supposed to do when the building warms up. There is no sign of anything stuck on or running away.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal midday cooling load on HVAC Unit 3 for a warm Friday afternoon so it is not re-opened in next month's review; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.0
+ },
+ "FA-0018": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.62,
+  "explanation_text": "Refrigeration in Zone A has been running well above its normal level for this hour and this outdoor temperature, and it has stayed there for most of the morning rather than settling back. Heat alone does not explain it, because the comparison already allows for the warm day. A cooling unit that runs continuously without catching up usually means the compressor is struggling or short-cycling, which will get worse and risks product temperature.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A today to inspect the lead compressor and check suction/discharge pressures and run-time percentage against the day's ambient conditions.",
+  "symptom_to_check": "Compressor running near-continuously with poor pull-down; check suction and head pressures, superheat, short-cycling, contactor and motor amp draw against nameplate, and condenser coil cleanliness.",
+  "latency_seconds": 8.66
+ },
+ "FA-0158": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The rise builds through the late morning alongside warming outdoor conditions and midday activity, then falls back and fluctuates rather than holding at a high level. That up-and-down pattern is what refrigeration normally does when doors are opening and the day heats up, not what failing equipment looks like, since a failure would keep the load elevated. The size of the increase is modest and well within what this zone can draw.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal midday peak-activity load on Refrigeration Zone B for a warm Thursday so it is not re-opened next month; no work order needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.93
+ },
+ "FA-0513": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.6,
+  "explanation_text": "The unit is drawing noticeably more power than normal for these overnight hours and is staying there rather than settling back down, even though the outside air is cooling. That pattern points to the unit having to work harder than it should to move air, most commonly from restricted or dirty filters. It is not urgent, but it will keep costing extra energy until it is checked.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 3 over the next 24 hours, especially the 01:00-06:00 window; if overnight draw again sits at roughly 50-60 kWh/hr against a 35 kWh/hr baseline while outdoor temperature is falling, raise a filter and airflow service call.",
+  "symptom_to_check": "",
+  "latency_seconds": 7.91
+ },
+ "FA-0531": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.78,
+  "explanation_text": "The higher usage on this air-conditioning unit follows a hot afternoon, with the building still shedding heat into the evening. Consumption is in line with the surrounding hours and is easing off as the outside temperature falls, rather than holding at a fixed high level the way a mechanical fault would. This is the cooling system doing its job on a warm summer day.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-weather evening cooling load on HVAC Unit 3 for the 26 July heat day so it is not re-opened in next month's review; no work order needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.71
+ },
+ "FA-0484": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.76,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the morning, peaking in the early afternoon heat and easing as the day levels off. This is the cooling system working harder to hold the building temperature, which is exactly what it is designed to do. Nothing in the pattern suggests a failing part.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a normal warm-afternoon cooling ramp on HVAC Unit 3 for Friday 12 June so it is not re-opened next month; no callout needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.51
+ },
+ "FA-0086": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.85,
+  "explanation_text": "The rise in HVAC use tracks the outdoor temperature climbing through the morning into a hot afternoon, building gradually rather than jumping suddenly. The cooling system is simply working harder to hold indoor conditions on a warm day, which is expected behaviour. There is no sign of a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a hot-weather HVAC load event for Wednesday 10 June (outdoor temperature reaching the high 80s) so the same afternoon ramp is not re-flagged; consider raising the summer baseline for HVAC Unit 1 on days above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.21
+ },
+ "FA-0329": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.82,
+  "explanation_text": "The increase is modest and happens during the hottest part of a warm summer afternoon, when cooling demand naturally rises. Usage in the surrounding hours is similar or higher and then tapers as the day cools, which is what normal weather-driven cooling looks like. There is no sustained climb or plateau that would suggest the unit is struggling or failing.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected mid-afternoon cooling load on HVAC Unit 2 during the 86F peak on 21 July so it is not re-flagged in next month's review; consider widening the temperature-adjusted baseline for afternoons above 85F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.06
+ },
+ "FA-0228": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The rise happened as the afternoon reached its warmest point, and the surrounding hours show similarly elevated cooling load rather than a sudden isolated jump. The unit settled back into the normal afternoon pattern without staying stuck at a high level. This is the cooling system working harder in warm weather, which is expected behaviour.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon cooling load on HVAC Unit 2 so the same 16:00 temperature-driven peak is not re-flagged; no site visit needed.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.71
+ },
+ "FA-0218": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.72,
+  "explanation_text": "The rise in HVAC use lines up with the warmest part of the afternoon, and consumption eases back as the outside air cools. Earlier hours in the day show similar or higher usage, so this level of draw is well within what this unit normally does on a mild-to-warm afternoon. There is no sustained plateau or runaway pattern that would suggest a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a normal warm-afternoon cooling response on HVAC Unit 2 so the same 15:00 temperature-driven rise is not re-flagged; consider widening the temperature-adjusted baseline for this unit.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.17
+ },
+ "FA-0254": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.86,
+  "explanation_text": "The rise in HVAC usage tracks the outdoor temperature climb through the morning almost exactly, building gradually rather than jumping suddenly. This is the cooling system working harder on a warm day, which is expected behaviour. Nothing in the pattern suggests a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as a warm-weather cooling load event for HVAC Unit 2 on 4 June so it is not re-opened in next month's review; no action needed unless usage stays elevated after temperatures drop in the evening.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.64
+ },
+ "FA-0379": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.72,
+  "explanation_text": "The rise is small and sits right in line with the hours either side, all of which are running at a similar level on a hot afternoon. Nothing stepped up and stayed up, and there is no sign of the equipment struggling \u2014 it simply looks like a busy warm afternoon with the refrigeration working harder to hold temperature. This is normal daytime operating behaviour rather than a fault.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal warm-afternoon peak throughput load on the compressor bank for 8 July so it is not re-flagged; consider raising the summer afternoon baseline for this sub-system above 87F.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.34
+ },
+ "FA-0024": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.6,
+  "explanation_text": "The refrigeration zone has been running well above its normal overnight level for several hours in a row rather than briefly peaking and settling back. The load is elevated but not physically impossible, so this is real consumption rather than a meter glitch, and the warm night alone does not account for a continuous overnight excess on refrigeration. That pattern usually means the cooling plant is working continuously to hold temperature, most often a struggling compressor.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to Zone A to check compressor run time, suction and discharge pressures, and whether the zone is holding its setpoint overnight.",
+  "symptom_to_check": "Compressor short-cycling or running continuously without reaching cut-out; check head pressure, superheat, condenser coil cleanliness and whether zone temperature is drifting above setpoint.",
+  "latency_seconds": 9.98
+ },
+ "FA-0522": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.86,
+  "explanation_text": "The rise in usage tracks the outdoor temperature almost exactly through the morning, climbing steadily as the day heats up rather than jumping suddenly and staying flat. This is the cooling system working harder on a hot summer day, which is expected behaviour. There is no sign of a component failing.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as the expected hot-weather cooling ramp on HVAC Unit 3 for the 17 July heat day so it is not re-opened next month; consider raising the summer baseline for this unit above 90F.",
+  "symptom_to_check": "",
+  "latency_seconds": 4.54
+ },
+ "FA-0320": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-010",
+  "confidence_score": 0.85,
+  "explanation_text": "The rise in energy use tracks the outdoor temperature almost step for step through a hot summer morning, climbing steadily as the day warms rather than jumping and staying flat. This is the cooling system working harder to hold indoor conditions, which is exactly what it is designed to do. There is no sign of a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as expected hot-weather cooling load for 17 July (temperatures rising into the 90s) so the same daytime HVAC ramp is not re-flagged next month; consider raising the summer baseline for HVAC Unit 2 on days above 90F.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.24
+ },
+ "FA-0435": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.62,
+  "explanation_text": "The rise is modest and short-lived, and the surrounding hours swing up and down by similar or larger amounts on a hot midday shift. Consumption returns to normal immediately afterwards, which is what busy-period activity looks like rather than failing equipment. There is no sustained climb or plateau that would point to a mechanical problem.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as normal midday activity on Refrigeration Zone A during hot-weather peak throughput; no investigation needed unless the zone holds above roughly 1.5x baseline for three or more consecutive hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 5.08
+ },
+ "FA-0389": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-001",
+  "confidence_score": 0.55,
+  "explanation_text": "The refrigeration compressors drew noticeably more power for a single hour in the middle of the night, then settled back to normal, even though it was cooling off outside. A short burst of extra work when conditions are getting easier suggests the equipment briefly had to work harder than it should have, such as a compressor short-cycling or recovering from a temperature excursion. It is a modest, physically believable increase rather than a metering error, so it is worth a look before it becomes a failure.",
+  "recommended_action": "dispatch",
+  "next_action": "Send a refrigeration technician to inspect the compressor bank controls and cycling history around 02:00, starting with suction/discharge pressures and any defrost or door-open events logged overnight.",
+  "symptom_to_check": "Compressor short-cycling or extended run time at 02:00 with abnormal suction/discharge pressures or high head pressure; check for defrost overlap and case temperature recovery.",
+  "latency_seconds": 6.36
+ },
+ "FA-0156": {
+  "top_level_class": "operational_variation",
+  "classification_type_id": "CT-008",
+  "confidence_score": 0.68,
+  "explanation_text": "The reading sits only slightly above its usual level for a warm Thursday afternoon, and the hours either side show similar or higher use, so nothing stands out as unusual. There is no sustained climb or plateau that would point to failing equipment. This looks like normal busy-period activity on the refrigeration zone during the warmest part of the day.",
+  "recommended_action": "dismiss",
+  "next_action": "Log this as routine warm-afternoon peak activity on Refrigeration Zone B so the same mid-afternoon rise is not re-flagged next month; no action needed unless the zone stays elevated for three or more consecutive hours.",
+  "symptom_to_check": "",
+  "latency_seconds": 6.37
+ },
+ "FA-0471": {
+  "top_level_class": "equipment_fault",
+  "classification_type_id": "CT-004",
+  "confidence_score": 0.52,
+  "explanation_text": "Overnight cooling demand was falling as it got cooler outside, yet this unit briefly drew noticeably more power and then settled slightly higher than before rather than continuing to drop. That pattern suggests the unit is working harder than conditions require, which usually points to restricted airflow such as a dirty or partly blocked filter. It is not severe enough to look like a failed fan, but it is not explained by the weather either.",
+  "recommended_action": "monitor",
+  "next_action": "Watch HVAC Unit 3 over the next 24 hours for repeat overnight (roughly 00:00-04:00) draws above about 60 kWh/hr while outdoor temperature is falling; if it recurs on two or more nights, schedule an HVAC filter and airflow check.",
+  "symptom_to_check": "",
+  "latency_seconds": 8.57
+ }
+}

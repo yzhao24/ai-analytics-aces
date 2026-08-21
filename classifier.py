@@ -28,6 +28,8 @@ from pathlib import Path
 
 import pandas as pd
 
+import operations_log
+
 DATA_FILE = Path(__file__).parent / "dummy_data_set2.xlsx"
 OUT_FILE = Path(__file__).parent / "classifications_llm.json"
 
@@ -194,7 +196,7 @@ def spike_profile(readings, anomaly):
     )
 
 
-def build_prompt(data, anomaly, system):
+def build_prompt(data, anomaly, system, declared=None):
     sys_name = system.system_name if system is not None else "unknown sub-system"
     sys_type = system.system_type if system is not None else "unknown"
     peak = anomaly.baseline_kwh + anomaly.spike_kwh
@@ -210,6 +212,8 @@ def build_prompt(data, anomaly, system):
 
 CONSUMPTION, 3 HOURS EITHER SIDE
 {spike_profile(data['energy_readings'], anomaly)}
+
+{operations_log.as_prompt_evidence(declared or [])}
 
 CANDIDATE CLASSIFICATIONS — choose exactly one classification_type_id
 {candidate_table(data['classification_registry'])}"""
@@ -229,6 +233,9 @@ def classify_all(only_missing=False):
     )
 
     data = load_inputs()
+    ops_log = operations_log.load()
+    if ops_log:
+        print(f"  {len(ops_log)} declared operation(s) will be offered as evidence")
     try:
         # Resolves, in order: ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, then the
         # active `ant auth login` profile. Nothing is read from this repo.
@@ -251,6 +258,10 @@ def classify_all(only_missing=False):
         ]
         system = sys_rows.iloc[0] if not sys_rows.empty else None
 
+        declared = operations_log.covering(
+            ops_log, anomaly.facility_id, anomaly.system_id,
+            *operations_log.window_of(anomaly))
+
         print(f"  {anomaly.anomaly_id} …", end="", flush=True)
         t0 = time.monotonic()
         try:
@@ -263,7 +274,8 @@ def classify_all(only_missing=False):
                     "format": {"type": "json_schema", "schema": SCHEMA},
                 },
                 messages=[
-                    {"role": "user", "content": build_prompt(data, anomaly, system)}
+                    {"role": "user",
+                     "content": build_prompt(data, anomaly, system, declared)}
                 ],
             )
         except anthropic.AuthenticationError:

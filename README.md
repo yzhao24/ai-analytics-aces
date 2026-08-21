@@ -17,6 +17,7 @@ with the statistical evidence behind the call.
 | `run_dashboard.py` | Launcher that works from any working directory |
 | `classifier.py` | The AI classification layer. Calls Claude, writes `classifications_llm.json` |
 | `input_guard.py` | Checks incoming meter data against the settled history |
+| `operations_log.py` | Planned operations the manager declares. Evidence for the classifier, never a suppression |
 | **The data** | |
 | `generate_dataset.py` | Builds the dataset from scratch. Edit this when the data needs to change |
 | `fetch_weather.py` | Real hourly temperatures from Open-Meteo. Also imported by the generator |
@@ -161,10 +162,75 @@ r.loc[r.index[:6], 'system_id'] = 'SYS-999'
 r.to_csv('sample_bad_export.csv', index=False)"
 ```
 
+## Declaring planned operations
+
+Two of the classifier's errors are the same shape: a Peak Throughput Day and a
+Temporary Equipment Rental, each read as an equipment fault. Neither shift
+schedules nor rental logs are inputs the product receives, so nothing separates a
+busy shift from a stuck compressor on kWh alone.
+
+**This is not the remedy we already measured failing.** The `experiment/shift-schedule`
+branch gave the model a schedule and asked it to *infer* whether a day was busy;
+precision fell from 82% to 64%, because a day planned at 130% of normal adds 7–10 kWh
+and the alarm does not fire until 20. A realistic busy day never reaches the detector.
+
+Declaring is a different act. In **Settings → Planned Operations** the manager records
+an event they already know about — an extra shift, a rented chiller, a maintenance
+window — scoped to a facility, a sub-system, and a time range. That is testimony, not
+inference, so it does not have to clear a detection threshold to be useful.
+
+Anything flagged inside a declared window shows the declaration in the Classification
+Panel, and `classifier.py` passes it to the model as evidence. Declarations recorded
+after a spike was classified say so, since the stored classification could not have
+seen them — re-run the classifier to take them into account.
+
+**It never suppresses an alert and never changes the agent's decision.** A compressor
+can fail during a busy shift, and at a 167:1 miss-to-false-alarm ratio, auto-dismissing
+anything inside a declared window is precisely the wrong direction. The prompt says the
+same thing to the model: a declaration is credible evidence about what was happening,
+not proof of cause.
+
+Declarations live in `operations_log.json`, which is local state and gitignored.
+`python3 operations_log.py` runs the overlap and scoping checks.
+
+**On measuring it.** Declaring the injected operational events in the synthetic test set
+is close to handing over the ground-truth label, so any precision gain measured that way
+is circular and should not be quoted. What can be tested honestly is the failure
+direction: a declaration covering a window where a real fault occurred must not talk the
+classifier out of calling it a fault.
+
+---
+
+## The dispatch threshold
+
+The agent recommends dispatch only when `z ≥ 3.0` **and** the classifier's confidence
+clears a threshold. That threshold ships at **0.75**, and every figure in this README
+is scored against it.
+
+Your own cost model implies a different number. A visit costs $300 for certain; not
+visiting costs `p × $2,000`. Dispatching therefore pays whenever **p > 0.15** — five
+times below the shipped default. **Settings → Dispatch threshold** now sets it live
+and shows the gap; the agent, the Review Recommended badge and the History screen's
+decision value all read the same value.
+
+Moving it to 0.15 takes the cost of following the tool from $35,200 to $15,100 on
+identical predictions. That is still worse than dispatching on every spike ($7,500),
+because 20 of the 25 anomalies are genuine faults — a perfect classifier saves $1,500
+while one missed fault costs $2,000. The threshold is the first fix, not the whole one.
+
+The default is left at 0.75 deliberately, so the numbers reported here and in the
+evaluation continue to describe what the product does out of the box.
+
+---
+
 ## The three actions
 
 Every recommendation is one of **dispatch**, **monitor**, or **dismiss**, and the same
-three verbs run through the whole system — the classifier's output schema, the standing
+three verbs run through the whole system. The Classification Panel offers all three,
+with the agent's recommendation marked and made primary — it used to offer whichever
+action matched the top-level class, so an equipment fault showed a Dispatch button even
+when the agent had just recommended monitor. All three stay available so a manager who
+disagrees with the agent is not stuck — the classifier's output schema, the standing
 action attached to each of the 14 classification types, the button in the Classification
 Panel, and what gets written to `manager_actions`. A fourth path, **Flag for Engineer
 Review**, is always available and records as `escalated`.

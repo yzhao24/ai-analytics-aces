@@ -101,38 +101,38 @@ cleared its bar.
 
 And three criteria still failed.
 
-Correctness. Right class on twelve of fourteen, right subtype on only seven.
-Both class errors are the same shape — a peak throughput day and a rented
-equipment fleet, each read as a fault. That isn't a bad prompt: shift schedules
-and rental logs aren't inputs we receive, so nothing separates a busy shift from
-a stuck compressor on kilowatt-hours alone. A specification failure — Theory B,
-exactly where it said it would be.
+Correctness. Right class on twelve of fourteen, subtype on only seven. Both class
+errors are the same shape — a busy day and a rented fleet, each read as a fault.
+That isn't a bad prompt: shift schedules aren't an input we receive, so nothing
+separates a busy shift from a stuck compressor on kilowatt-hours alone.
 
-Calibration. Confidence averages point-seven-zero when right and
-point-seven-five when wrong — and I'd flag that the second number is the mean of
-just two cases. The honest reading is that the two distributions overlap almost
-completely, so confidence tells you nothing about whether the answer is right.
+Calibration. Confidence averages point-seven-zero when right, point-seven-five
+when wrong — though that second figure is the mean of two cases. The honest
+reading is the distributions overlap, so confidence tells you nothing.
 
-The third one is worth your attention.""",
+And the third — decision value — turned out not to be about the tool at all.""",
 
-8: """We didn't stop at precision and recall. We priced the tool against two
-policies you could follow with no AI at all — three hundred dollars a dispatch,
-two thousand for a fault you miss, across twenty-five anomalies.
+8: """We priced the tool against dispatching to every spike — three hundred
+dollars a visit, two thousand for a fault you miss.
 
-Follow our tool: four technicians sent, three of twenty faults caught,
-thirty-five thousand two hundred dollars. Dispatch on every spike — no model, no
-judgment — seven thousand five hundred.
+Follow our tool: thirty-five thousand two hundred. Dispatch on everything: seven
+and a half. We are four point seven times worse than the dumbest possible policy,
+and that is what this deck said until four days ago.
 
-We are four-point-seven times worse than the dumbest possible policy.
+Then we asked where those twenty-five alarms came from. Our detector raises five
+hundred and sixty-two a year. Only the twenty-five matching a planted anomaly were
+ever scored — we deleted ninety-six percent of the problem before measuring. And
+triaging five hundred alarms down to the twenty worth acting on is the entire job.
 
-Ninety-seven percent of that isn't money spent, it's exposure — twelve hundred
-dollars out the door and thirty-four thousand of faults left uninvestigated.
-Only four of twenty-five spikes clear the point-seven-five gate, so seventeen of
-twenty real faults get told to "monitor" and nobody goes.
+That deletion is what makes blanket dispatch look cheap. On twenty-five alarms it
+costs seven and a half thousand. On five hundred and sixty-two, a hundred and
+sixty-eight thousand.
 
-The lesson: we built for "what is this spike?" The decision needs "should I
-dispatch?" A rubric that stopped at precision and recall would have let us stand
-here and call this a success.""",
+So we classified a hundred of the alarms we had been throwing away, for two
+dollars forty. Against the population this product would really face, following it
+saves about a hundred and thirty-four thousand dollars a year.
+
+The number on the left is real. It is just not a measurement of the product.""",
 
 9: """Two of us audited this independently. These are the limits, said out loud.
 
@@ -158,36 +158,38 @@ hundred sixty-two a year and only twenty-five are scored — so precision says
 nothing about telling a real event from a false one, and that's the harder
 job.""",
 
-10: """If this shipped Monday, here's how we'd watch it.
+10: """If this shipped Monday, here is how we would watch it.
 
 The best signal is the one the product generates about itself — the exception
-notes. Every time a manager says none of these three fit, we capture why. A
-reason that recurs is a missing fifteenth cause, and both misclassifications
-would have surfaced that way. Alongside it: dispatch outcomes, how many spikes
-clear the gate, and input-guard findings per upload.
+notes. Every time a manager says none of these three fit, we capture why. A reason
+that recurs is a missing fifteenth cause. Alongside it: dispatch outcomes, how
+many spikes clear the gate, and input-guard findings per upload.
 
-We also wrote down what would make us pull it — precision under sixty percent
-over thirty days, exceptions over twenty percent, or any month the tool costs
-more than dispatching on everything.
+We also wrote down what would make us pull it — precision under sixty percent over
+thirty days, exceptions over twenty percent, or any month the tool costs more than
+dispatching on everything.
 
-And what we'd build first isn't a better prompt. It's the dispatch rule. Our own
-numbers put break-even at fifteen percent — three hundred dollars to dispatch
-against a two-thousand-dollar miss — and we gated at seventy-five. That one
-change cuts the loss from thirty-five thousand to fifteen thousand. It still
-doesn't beat dispatching on everything, and that's the second fix: at an eighty
-percent fault rate the whole prize is fifteen hundred dollars while a single miss
-costs two thousand, so the test set itself has to get harder.""",
+And what we would build first is not a better prompt. It is to finish the
+measurement we started four days ago: score the other four hundred and
+thirty-seven alarms, then tune the dispatch threshold on that population. Worth
+noting — the break-even our own cost model implies is zero point one five, and it
+is worse than the threshold we ship, because confidence is not a calibrated
+probability and cannot be dropped into that formula.""",
 
 11: """Where we landed.
 
-Theory A cleared the bar we set in advance. Theory B was right about where the
-confusion lives — and we can say exactly where, because we tried the fix our own
-specification prescribed and measured it failing.
+The classifier works. Our measurement of it nearly did not.
 
-We built a good classifier. We have not yet built a good product. The gap
-between those is a dispatch rule, and it's the first thing we'd build.
+Eighty-two percent precision was measured on planted events. Against the alarms
+this product would really face it is nearer ten percent — a much less flattering
+number, and the true one. And it is still worth deploying: following it saves
+roughly a hundred and thirty-four thousand a year against dispatching on
+everything.
 
-Questions — especially about the failures.""",
+We found that four days ago, by testing it on the alarms we had spent the whole
+project discarding. We very nearly stood here and told you the opposite.
+
+Questions — especially about the failures."""
 }
 
 

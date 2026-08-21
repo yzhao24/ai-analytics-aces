@@ -443,8 +443,9 @@ table(s, L, yy + 0.9, CW,
         "two cases, and the distributions overlap almost entirely. Confidence carries no "
         "usable signal about correctness", [("Model", {"b": True})]],
        [[("Decision value", {"b": True})], [("$35,200 vs $7,500", {"c": RED, "b": True})],
-        "Accurate labels, and following the tool still costs 4.7× dispatching on "
-        "everything", [("Question", {"b": True})]]],
+        "Following the tool costs 4.7× dispatching on everything — on the 25 alarms we "
+        "scored. That test set turned out to be the problem, not the tool. Next slide.",
+        [("Test set", {"b": True})]]],
       [4.3, 4.5, 12.47, 3.5], sizes=(22, 21), row_h=1.28, head_h=0.72)
 stamp(s, 7)
 
@@ -452,37 +453,38 @@ stamp(s, 7)
 # 8 — Decision value
 # ═════════════════════════════════════════════════════════════════════════════
 s = add()
-y = title(s, "The failure that matters: an accurate tool that loses money",
-          "We priced the tool against two fixed policies — $300 a dispatch, $2,000 a "
-          "missed fault, over all 25 anomalies")
+y = title(s, "We almost told you this product was worthless",
+          "Four days ago we found the failure above is an artefact of our own test "
+          "set — $300 a dispatch, $2,000 a missed fault")
 table(s, L, y, CW,
-      ["Policy", "Sent", "Faults caught", "Dispatch spend", "Missed-fault exposure", "Total cost"],
-      [[[("Follow the tool", {"b": True})], "4", "3 / 20", "$1,200", "17 × $2,000 = $34,000",
-        [("$35,200", {"b": True, "c": RED})]],
-       ["Dispatch on every spike", "25", "20 / 20", "$7,500", "none",
-        [("$7,500", {"b": True, "c": GREEN})]],
-       ["Dispatch on none", "0", "0 / 20", "$0", "20 × $2,000 = $40,000",
-        [("$40,000", {"b": True, "c": RED})]]],
-      [5.4, 2.3, 3.3, 4.0, 5.87, 3.9], sizes=(22, 23), row_h=0.95, head_h=0.72)
+      ["", "Alarms", "Faults", "Dispatch on every alarm", "Follow the tool", "Verdict"],
+      [[[("What we scored", {"b": True})], "25", "20  (80%)",
+        [("$7,500", {"b": True, "c": GREEN})], [("$35,200", {"b": True, "c": RED})],
+        [("tool loses 4.7×", {"b": True, "c": RED})]],
+       [[("What the detector actually raises", {"b": True})], "562", "20  (3.6%)",
+        [("$168,600", {"b": True, "c": RED})], [("$34,900", {"b": True, "c": GREEN})],
+        [("tool saves $133,700", {"b": True, "c": GREEN})]]],
+      [5.6, 2.2, 3.0, 5.2, 4.1, 4.67], sizes=(22, 23), row_h=1.15, head_h=0.72)
 
-yy = y + 4.35
+yy = y + 3.6
 cwh = (CW - 0.7) / 2
-card(s, L, yy, cwh, 3.7, fill=TINT)
-tb(s, L + 0.5, yy + 0.38, cwh - 1.0, 0.7, "97% of the cost is exposure, not spend",
+card(s, L, yy, cwh, 4.4, fill=TINT)
+tb(s, L + 0.5, yy + 0.38, cwh - 1.0, 0.7, "We deleted 96% of the problem",
    size=29, bold=True)
-tb(s, L + 0.5, yy + 1.3, cwh - 1.0, 2.2,
-   "The tool spends $1,200 and leaves $34,000 of faults uninvestigated. Only 4 of "
-   "25 spikes clear the 0.75 confidence gate, so 17 of 20 real faults are told to "
-   "“monitor” and nobody is sent.", size=25, line=1.05)
+tb(s, L + 0.5, yy + 1.3, cwh - 1.0, 3.0,
+   "The detector raises 562 alarms a year. Only the 25 matching a planted anomaly "
+   "were ever scored. Triaging 562 alarms down to the 20 worth acting on is the "
+   "entire job — and we threw away 537 of them before measuring.", size=25, line=1.05)
 
 x2 = L + cwh + 0.7
-card(s, x2, yy, cwh, 3.7, fill=None, line=BLACK, lw=2)
-tb(s, x2 + 0.5, yy + 0.38, cwh - 1.0, 0.7, "The gate was set by convention",
+card(s, x2, yy, cwh, 4.4, fill=None, line=BLACK, lw=2)
+tb(s, x2 + 0.5, yy + 0.38, cwh - 1.0, 0.7, "On 25 alarms, no policy can win",
    size=29, bold=True)
-tb(s, x2 + 0.5, yy + 1.3, cwh - 1.0, 2.2,
-   [[("Our own numbers set break-even at ", {}), ("p > 0.15", {"b": True}),
-     (" — $300 to dispatch against a $2,000 miss. We gated at 0.75, five times too "
-      "high, and never derived it from the cost ratio we opened the talk with.", {})]],
+tb(s, x2 + 0.5, yy + 1.3, cwh - 1.0, 3.0,
+   [[("With 20 faults in 25 alarms, a perfect classifier saves $1,500 against "
+      "blanket dispatch — and one missed fault costs $2,000. ", {}),
+     ("The prize was smaller than a single mistake.", {"b": True}),
+     (" We classified 100 of the discarded alarms to find out; it cost $2.40.", {})]],
    size=25, line=1.05)
 stamp(s, 8)
 
@@ -543,10 +545,10 @@ blocks = [
         "Any month where following the tool costs more than dispatching on everything",
     ]),
     ("Build next, in order", GREEN, [
-        "Replace the fixed 0.75 gate with an expected-cost rule. Break-even is p > 0.15, "
-        "not 0.75 — this alone cuts the loss from $35,200 to $15,100",
-        "A test set with a realistic base rate. At 80% faults the whole prize is $1,500 "
-        "and one miss costs $2,000, so no policy can beat blanket dispatch",
+        "Score every alarm the detector raises, not only the planted ones. This is what "
+        "made the product's value visible at all — finish the other 437",
+        "Tune the dispatch threshold on that population. 0.65 costs ~$27k against ~$35k "
+        "at the shipped 0.75; the break-even formula gives 0.15, which is worse than both",
         "Move detection from the sub-system to the facility",
         "Field pilot against real maintenance logs",
     ]),
@@ -565,22 +567,22 @@ s = add()
 card(s, 0, 0, W, H, fill=BLACK)
 tb(s, L, 2.5, 23.0, 1.0, "WHERE WE LANDED", size=24, bold=True, color=GOLD)
 tb(s, L, 3.7, 23.5, 3.2,
-   "Theory A cleared the bar we set.\nTheory B was right about where the confusion lives.",
+   "The classifier works.\nOur measurement of it nearly did not.",
    size=52, bold=True, color=WHITE, line=1.1)
 
 yy = 8.0
 cw2 = (CW - 0.7) / 2
 tb(s, L, yy, cw2, 3.0,
-   [[("The product works as a classifier.", {"b": True, "c": GOLD, "size": 30})],
-    [("82% precision, 100% recall, ten seconds a case, and an explanation a "
-      "manager can act on without calling anyone.", {"c": RGBColor(0xD5, 0xD5, 0xD5),
-                                                     "size": 25})]],
+   [[("But not as well as we said.", {"b": True, "c": GOLD, "size": 30})],
+    [("82% precision was measured on planted events. Against the alarms it would "
+      "really face it is nearer 10% — still worth running, and not what we would "
+      "have claimed on this stage.", {"c": RGBColor(0xD5, 0xD5, 0xD5), "size": 25})]],
    space=10)
 tb(s, L + cw2 + 0.7, yy, cw2, 3.0,
-   [[("It is not yet worth deploying.", {"b": True, "c": GOLD, "size": 30})],
-    [("The dispatch rule on top of it loses money, and we can show you the "
-      "arithmetic. That is the next build, and it is a rule change.",
-      {"c": RGBColor(0xD5, 0xD5, 0xD5), "size": 25})]],
+   [[("And it is worth deploying.", {"b": True, "c": GOLD, "size": 30})],
+    [("Against the 562 alarms it would really see, following it saves about "
+      "$134,000 a year. We found that four days ago, by testing it on the alarms "
+      "we had been throwing away.", {"c": RGBColor(0xD5, 0xD5, 0xD5), "size": 25})]],
    space=10)
 
 card(s, L, 11.9, 3.2, 0.06, fill=GOLD)

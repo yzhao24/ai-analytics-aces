@@ -417,22 +417,51 @@ para(doc, [("97% of the tool's cost is exposure, not spend. ", B),
            (" counts as a miss because nobody is dispatched — if monitoring reliably catches the "
             "fault later at reduced cost, the figure falls; we have no evidence either way, so we "
             "scored the conservative reading.", {})])
-para(doc, [("The gate was set by convention, and our own numbers contained the right value. ", B),
-           ("Dispatching costs $300 with certainty; not dispatching costs p × $2,000, so "
-            "break-even is p > 0.15 — and we gated at 0.75, five times too high. The model's "
-            "lowest confidence anywhere on the core set is 0.52, so every case clears the "
-            "economically correct bar and none clear ours. 12 of the 20 true faults are blocked "
-            "by that threshold alone, with the classification already calling for a "
-            "technician.", {})])
-para(doc, [("Fixing the gate is necessary and not sufficient. ", B),
-           ("Removing it drops the cost from $35,200 to $15,100 — still worse than dispatching "
-            "on everything, and the reason is the test set. With 20 faults among 25 anomalies a "
-            "perfect classifier spends $6,000 against blanket dispatch's $7,500, so the entire "
-            "achievable prize is $1,500 while one missed fault costs $2,000. No policy that "
-            "ever withholds a dispatch from a real fault can win here. That base rate follows "
-            "from discarding the detector's 562 false alarms, which makes the scope limitation "
-            "in §7 the binding constraint on decision value rather than a footnote. A rubric "
-            "that stopped at precision and recall would have reported success.", {})])
+para(doc, [("Then we found the measurement was wrong. ", B),
+           ("Our detector raises 562 alarms across the year; only the 25 matching an injected "
+            "anomaly were ever scored. Triaging 562 alarms down to the 20 worth acting on is "
+            "the product's entire job, and we discarded 96% of them before measuring. That "
+            "deletion is what makes blanket dispatch look cheap: on 25 alarms it costs $7,500, "
+            "on 562 it costs $168,600. It also caps the achievable prize — with 20 faults among "
+            "25 alarms a perfect classifier saves $1,500 against blanket dispatch while one "
+            "missed fault costs $2,000, so no policy that ever withholds a dispatch can win. "
+            "The test set could not show the product working even in principle.", {})])
+para(doc, [("So we tested it on the alarms we had been throwing away. ", B),
+           ("Ground truth is free: a detection matching no injected anomaly is by construction "
+            "not an equipment fault. We classified a random sample of 100 of the 537 discarded "
+            "alarms, for $2.40.", {})])
+table(doc, ["Scored against", "Alarms", "Faults", "Dispatch on every alarm",
+            "Follow the tool", "Verdict"],
+      [["The 25 we reported", "25", "20  (80%)", "$7,500", [("$35,200", {"b": True, "c": RED})],
+        [("loses 4.7×", {"b": True, "c": RED})]],
+       [[("What the detector raises", B)], "562", "20  (3.6%)",
+        [("$168,600", {"b": True, "c": RED})], [("$34,900", {"b": True, "c": GREEN})],
+        [("saves $133,700", {"b": True, "c": GREEN})]]],
+      [1.5, 0.7, 0.95, 1.5, 1.15, 1.4], center_from=1, highlight=(0,))
+para(doc, [("The product saves roughly $134,000 a year at the threshold we ship, and the "
+            "failure we reported is an artefact of our own test set.", B),
+           (" 31% of the sampled false alarms were called equipment faults, so precision "
+            "against the population the product actually faces is nearer 10% (19 true "
+            "positives against ~166 false) than the 82% we measured on planted events. Both "
+            "corrections point the same way: our test set flattered the classifier and buried "
+            "the product.", {})])
+para(doc, [("A correction we would otherwise have shipped. ", B),
+           ("On the 25-case set, ignoring confidence and dispatching on the class scored best "
+            "($8,300 against $35,200), and we were about to recommend it. On the realistic "
+            "population that rule sends ~185 technicians and costs ~$58,000 — worse than the "
+            "gate it would have replaced. Sweeping the threshold puts the optimum near 0.65 "
+            "(~$27,000), not the 0.15 an expected-cost calculation gives; confidence is not "
+            "calibrated, so it cannot be substituted into that formula as if it were a "
+            "probability. The threshold has to be tuned empirically against a representative "
+            "alarm population, which is exactly what we had never assembled.", {})])
+para(doc, [("Limits of this result. ", GB),
+           ("n = 100 of 537, randomly sampled with a fixed seed, so the false-positive rate "
+            "carries roughly ±5 points and the extrapolations inherit that. The $133,700 uses "
+            "the shipped 0.75 threshold and needs no tuning; the $27,000 figure was tuned on "
+            "the same sample and should be treated as indicative. A ", G),
+           ("monitor", GI),
+           (" still counts as a miss throughout. Reproduce with python3 "
+            "false_alarm_sample.py --score.", G)])
 
 # ───────────────────────────── PART D ────────────────────────────────────────
 head(doc, "5.4  Part D — The measurement layer")

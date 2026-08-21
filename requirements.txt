@@ -1,6 +1,10 @@
+# Running the dashboard needs only the first four.
 streamlit>=1.30
 plotly>=5.18
 pandas>=1.5
-openpyxl>=3.1
+openpyxl>=3.1        # pandas reads the .xlsx dataset through this; no direct import
+
+# Only needed to re-run the classifier or the stability/usability harnesses
+# against the API. The dashboard ships with classifications_llm.json and runs
+# without credentials.
 anthropic>=0.70
-reportlab>=4.0

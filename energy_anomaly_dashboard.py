@@ -15,6 +15,8 @@ from pathlib import Path
 
 import input_guard
 import operations_log
+from costs import (BREAK_EVEN, COMMIT_THRESHOLD_DEFAULT, DISPATCH_COST,
+                   MISS_COST)
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -382,10 +384,6 @@ DECISION_RANK = {"dismiss": 0, "monitor": 1, "dispatch": 2}
 # worth it whenever p > DISPATCH_COST / MISS_COST. That is 0.15, five times
 # below the shipped default. Surfacing both is the point: the gap between them
 # is the product's largest known defect.
-from costs import (BREAK_EVEN, COMMIT_THRESHOLD_DEFAULT, DISPATCH_COST,
-                   MISS_COST)
-
-
 def commit_threshold():
     """The confidence a classification must reach before the agent will dispatch."""
     return float(st.session_state.get("conf_threshold", COMMIT_THRESHOLD_DEFAULT))

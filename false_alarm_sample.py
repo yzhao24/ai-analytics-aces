@@ -149,6 +149,13 @@ def score():
     if not RESULTS.exists():
         sys.exit("  nothing classified yet — run --classify first")
     res = json.loads(RESULTS.read_text())
+    # The alarm list is regenerated rather than tracked — the detector is
+    # deterministic, so rebuilding costs ~10s and keeps a 537-row file out of
+    # git. Scoring must not assume a previous --build in this working copy.
+    if not ALARMS.exists():
+        print("  false_alarms.json not present — rebuilding it (no API calls)")
+        build()
+        print()
     alarms = {r["anomaly_id"]: r for r in json.loads(ALARMS.read_text())}
     reg = pd.ExcelFile(classifier.DATA_FILE).parse("classification_registry") \
             .set_index("classification_id")

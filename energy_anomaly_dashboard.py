@@ -382,10 +382,8 @@ DECISION_RANK = {"dismiss": 0, "monitor": 1, "dispatch": 2}
 # worth it whenever p > DISPATCH_COST / MISS_COST. That is 0.15, five times
 # below the shipped default. Surfacing both is the point: the gap between them
 # is the product's largest known defect.
-COMMIT_THRESHOLD_DEFAULT = 0.75
-DISPATCH_COST = 300.0
-MISS_COST = 2000.0
-BREAK_EVEN = DISPATCH_COST / MISS_COST
+from costs import (BREAK_EVEN, COMMIT_THRESHOLD_DEFAULT, DISPATCH_COST,
+                   MISS_COST)
 
 
 def commit_threshold():
@@ -612,8 +610,7 @@ def score_test_set():
 # Cost parameters from the team spec: ~$300 per technician dispatch, $2,000-$8,000
 # in excess consumption per undetected equipment fault. The conservative end of the
 # miss range is used so the comparison cannot be accused of flattering the tool.
-DISPATCH_COST_USD = 300.0
-MISSED_FAULT_COST_USD = 2000.0
+
 
 
 @st.cache_data
@@ -655,7 +652,7 @@ def score_decision_value():
             "dispatches": int(dispatched.sum()),
             "caught": int((df.is_fault & dispatched).sum()),
             "missed": missed,
-            "cost": dispatched.sum() * DISPATCH_COST_USD + missed * MISSED_FAULT_COST_USD,
+            "cost": dispatched.sum() * DISPATCH_COST + missed * MISS_COST,
         }
 
     policies = {
@@ -1413,11 +1410,16 @@ def render_dashboard():
     n_confirmed = int(
         ((acts.action_taken == "dispatched") & (acts.acted_at >= month_start)).sum()
     ) if month_start is not None else 0
-    # Actions taken in this session count too. Previously the panel computed which
+    # Actions taken in this session count too — previously the panel computed which
     # of the three was taken and discarded it, so dispatching from the UI never
-    # moved this number.
+    # moved this number. They have to obey the same facility filter as the rest of
+    # the KPI, or selecting one site shows technicians sent to another.
+    session_facility = ano_all.set_index("anomaly_id").facility_id
     n_confirmed += sum(
-        1 for a in st.session_state.actions_taken.values() if a == "dispatched"
+        1
+        for aid, act in st.session_state.actions_taken.items()
+        if act == "dispatched"
+        and (facility == "ALL" or session_facility.get(aid) == facility)
     )
 
     reg = data["classification_registry"].set_index("classification_id")
@@ -1702,7 +1704,7 @@ def render_history():
         f'{"PASS" if dv["tool_wins"] else "FAIL"}</div>'
         f'<span class="muted" style="margin-left:9px">{verdict}</span>'
         f'<div class="muted" style="margin-top:7px">Priced at '
-        f"${DISPATCH_COST_USD:,.0f} per dispatch and ${MISSED_FAULT_COST_USD:,.0f} "
+        f"${DISPATCH_COST:,.0f} per dispatch and ${MISS_COST:,.0f} "
         f"per undetected fault — the conservative end of the spec's $2,000–$8,000 "
         f"range. Missed faults are charged to whichever policy failed to dispatch.</div></div>",
         unsafe_allow_html=True,
@@ -1806,8 +1808,9 @@ def render_settings():
         def _threshold_changed():
             # load_data() is deliberately not cleared — it reparses 78,840 rows.
             # Nothing it caches depends on the threshold; these four do.
-            for fn in (build_anomaly_view, compute_z_scores,
-                       score_test_set, score_decision_value):
+            # score_test_set scores classification correctness, which the
+            # threshold does not touch, so it is deliberately not cleared.
+            for fn in (build_anomaly_view, compute_z_scores, score_decision_value):
                 fn.clear()
 
         st.slider(

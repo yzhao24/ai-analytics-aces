@@ -21,10 +21,9 @@ HERE = Path(__file__).parent
 DATA_FILE = HERE / "dummy_data_set2.xlsx"
 LLM_FILE = HERE / "classifications_llm.json"
 
-DISPATCH_COST = 300.0        # spec: ~$300 per technician dispatch
-MISSED_FAULT_COST = 2000.0   # spec: $2,000-$8,000; conservative end
-COMMIT_THRESHOLD = 0.75      # the product's auto-classify gate
-TIMELINESS_LIMIT_S = 300     # spec horizon: 5 minutes
+from costs import (COMMIT_THRESHOLD_DEFAULT as COMMIT_THRESHOLD,
+                   DISPATCH_COST, MISS_COST as MISSED_FAULT_COST)
+from costs import TIMELINESS_LIMIT_S
 
 REQUIRED_FIELDS = [
     "top_level_class", "classification_type_id", "confidence_score",
